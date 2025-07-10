@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import {
   Dialog,
@@ -15,33 +14,12 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Plus, Trash2 } from 'lucide-react';
 
-interface MCQOption {
-  id: string;
-  text: string;
-  isCorrect: boolean;
-}
-
-interface MCQQuestion {
-  id: string;
-  type: 'mcq';
-  question: string;
-  options: MCQOption[];
-  points: number;
-  feedback?: string;
-}
-
-interface MCQEditModalProps {
-  question: MCQQuestion;
-  onSave: (question: MCQQuestion) => void;
-  onCancel: () => void;
-}
-
-export const MCQEditModal: React.FC<MCQEditModalProps> = ({
+export const MCQEditModal = ({
   question,
   onSave,
   onCancel,
 }) => {
-  const [editedQuestion, setEditedQuestion] = useState<MCQQuestion>(question);
+  const [editedQuestion, setEditedQuestion] = useState(question);
   const [allowMultiple, setAllowMultiple] = useState(() => {
     return question.options.filter(opt => opt.isCorrect).length > 1;
   });
@@ -51,28 +29,28 @@ export const MCQEditModal: React.FC<MCQEditModalProps> = ({
     setAllowMultiple(question.options.filter(opt => opt.isCorrect).length > 1);
   }, [question]);
 
-  const handleQuestionChange = (newQuestion: string) => {
+  const handleQuestionChange = (newQuestion) => {
     setEditedQuestion({
       ...editedQuestion,
       question: newQuestion,
     });
   };
 
-  const handlePointsChange = (points: number) => {
+  const handlePointsChange = (points) => {
     setEditedQuestion({
       ...editedQuestion,
       points: Math.max(0, points),
     });
   };
 
-  const handleFeedbackChange = (feedback: string) => {
+  const handleFeedbackChange = (feedback) => {
     setEditedQuestion({
       ...editedQuestion,
       feedback,
     });
   };
 
-  const handleOptionTextChange = (optionId: string, text: string) => {
+  const handleOptionTextChange = (optionId, text) => {
     setEditedQuestion({
       ...editedQuestion,
       options: editedQuestion.options.map(opt =>
@@ -81,7 +59,7 @@ export const MCQEditModal: React.FC<MCQEditModalProps> = ({
     });
   };
 
-  const handleOptionCorrectChange = (optionId: string, isCorrect: boolean) => {
+  const handleOptionCorrectChange = (optionId, isCorrect) => {
     if (allowMultiple) {
       // Multiple correct answers allowed - toggle individual option
       setEditedQuestion({
@@ -104,7 +82,7 @@ export const MCQEditModal: React.FC<MCQEditModalProps> = ({
 
   const handleAddOption = () => {
     if (editedQuestion.options.length < 6) {
-      const newOption: MCQOption = {
+      const newOption = {
         id: Date.now().toString(),
         text: `Option ${String.fromCharCode(65 + editedQuestion.options.length)}`,
         isCorrect: false,
@@ -116,7 +94,7 @@ export const MCQEditModal: React.FC<MCQEditModalProps> = ({
     }
   };
 
-  const handleRemoveOption = (optionId: string) => {
+  const handleRemoveOption = (optionId) => {
     if (editedQuestion.options.length > 2) {
       setEditedQuestion({
         ...editedQuestion,
@@ -125,7 +103,7 @@ export const MCQEditModal: React.FC<MCQEditModalProps> = ({
     }
   };
 
-  const handleAllowMultipleToggle = (checked: boolean) => {
+  const handleAllowMultipleToggle = (checked) => {
     setAllowMultiple(checked);
     if (!checked) {
       // If switching to single answer, keep only the first correct answer
@@ -235,7 +213,7 @@ export const MCQEditModal: React.FC<MCQEditModalProps> = ({
                       <Checkbox
                         checked={option.isCorrect}
                         onCheckedChange={(checked) =>
-                          handleOptionCorrectChange(option.id, checked as boolean)
+                          handleOptionCorrectChange(option.id, checked)
                         }
                       />
                     ) : (

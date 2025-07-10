@@ -1,16 +1,10 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Bold, Italic, Underline } from 'lucide-react';
 
-interface MinimalInstructionTitleEditorProps {
-  value: string;
-  onChange: (value: string) => void;
-}
-
-export const MinimalInstructionTitleEditor: React.FC<MinimalInstructionTitleEditorProps> = ({ value, onChange }) => {
+export const MinimalInstructionTitleEditor = ({ value, onChange }) => {
   const [isBold, setIsBold] = React.useState(false);
   const [isItalic, setIsItalic] = React.useState(false);
   const [isUnderline, setIsUnderline] = React.useState(false);
@@ -30,11 +24,11 @@ export const MinimalInstructionTitleEditor: React.FC<MinimalInstructionTitleEdit
     'Open Sans'
   ];
 
-  const insertEmoji = (emoji: string) => {
+  const insertEmoji = (emoji) => {
     onChange(value + emoji);
   };
 
-  const toggleFormat = (format: string) => {
+  const toggleFormat = (format) => {
     switch (format) {
       case 'bold':
         setIsBold(!isBold);

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import {
   Dialog,
@@ -13,53 +12,32 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Plus, Trash2 } from 'lucide-react';
 
-interface MatchingPair {
-  id: string;
-  term: string;
-  match: string;
-}
-
-interface MatchingQuestion {
-  id: string;
-  type: 'matching';
-  question: string;
-  pairs: MatchingPair[];
-  points: number;
-  feedback?: string;
-}
-
-interface MatchingEditModalProps {
-  question: MatchingQuestion;
-  onSave: (question: MatchingQuestion) => void;
-  onCancel: () => void;
-}
-
-export const MatchingEditModal: React.FC<MatchingEditModalProps> = ({
+export const MatchingEditModal = ({
   question,
   onSave,
   onCancel,
 }) => {
-  const [editedQuestion, setEditedQuestion] = useState<MatchingQuestion>(question);
+  const [editedQuestion, setEditedQuestion] = useState(question);
 
   useEffect(() => {
     setEditedQuestion(question);
   }, [question]);
 
-  const handleQuestionChange = (newQuestion: string) => {
+  const handleQuestionChange = (newQuestion) => {
     setEditedQuestion({
       ...editedQuestion,
       question: newQuestion,
     });
   };
 
-  const handlePointsChange = (points: number) => {
+  const handlePointsChange = (points) => {
     setEditedQuestion({
       ...editedQuestion,
       points: Math.max(0, points),
     });
   };
 
-  const handlePairChange = (index: number, field: 'term' | 'match', value: string) => {
+  const handlePairChange = (index, field, value) => {
     const newPairs = [...editedQuestion.pairs];
     newPairs[index] = { ...newPairs[index], [field]: value };
     setEditedQuestion({
@@ -69,7 +47,7 @@ export const MatchingEditModal: React.FC<MatchingEditModalProps> = ({
   };
 
   const handleAddPair = () => {
-    const newPair: MatchingPair = {
+    const newPair = {
       id: Date.now().toString(),
       term: '',
       match: '',
@@ -80,7 +58,7 @@ export const MatchingEditModal: React.FC<MatchingEditModalProps> = ({
     });
   };
 
-  const handleRemovePair = (index: number) => {
+  const handleRemovePair = (index) => {
     if (editedQuestion.pairs.length > 2) {
       const newPairs = editedQuestion.pairs.filter((_, i) => i !== index);
       setEditedQuestion({
@@ -90,7 +68,7 @@ export const MatchingEditModal: React.FC<MatchingEditModalProps> = ({
     }
   };
 
-  const handleFeedbackChange = (feedback: string) => {
+  const handleFeedbackChange = (feedback) => {
     setEditedQuestion({
       ...editedQuestion,
       feedback,
