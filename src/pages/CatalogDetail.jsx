@@ -68,7 +68,72 @@ const CatalogDetail = () => {
           }
         ]
       },
-      // Other catalog data truncated for brevity
+      '2': {
+        name: 'Data Science',
+        description: 'Data analysis, machine learning, and AI courses',
+        courses: [
+          {
+            id: '4',
+            title: 'Python for Data Science',
+            description: 'Learn Python programming for data analysis',
+            category: 'Programming',
+            status: 'Published' ,
+            students: 200,
+            thumbnail: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&h=200&fit=crop',
+            duration: '8 weeks',
+            difficulty: 'Beginner',
+            isActive: true
+          },
+          {
+            id: '5',
+            title: 'Machine Learning Basics',
+            description: 'Introduction to machine learning concepts',
+            category: 'AI/ML',
+            status: 'Published' ,
+            students: 150,
+            thumbnail: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=400&h=200&fit=crop',
+            duration: '10 weeks',
+            difficulty: 'Intermediate',
+            isActive: true
+          }
+        ]
+      },
+      '3': {
+        name: 'Mobile Development',
+        description: 'iOS and Android app development',
+        courses: [
+          {
+            id: '6',
+            title: 'React Native Development',
+            description: 'Build cross-platform mobile apps',
+            category: 'Mobile',
+            status: 'Published',
+            students: 95,
+            thumbnail: 'https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=400&h=200&fit=crop',
+            duration: '8 weeks',
+            difficulty: 'Intermediate',
+            isActive: true
+          }
+        ]
+      },
+      '4': {
+        name: 'DevOps',
+        description: 'Cloud computing, deployment, and infrastructure',
+        courses: [
+          {
+            id: '7',
+            title: 'Docker & Kubernetes',
+            description: 'Container orchestration and deployment',
+            category: 'Infrastructure',
+            status: 'Published' ,
+            students: 75,
+            thumbnail: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=400&h=200&fit=crop',
+            duration: '6 weeks',
+            difficulty: 'Advanced',
+            isActive: true
+          }
+        ]
+      }
     };
     return catalogs[id] || catalogs['1'];
   };
