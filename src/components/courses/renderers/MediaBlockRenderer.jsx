@@ -1,12 +1,6 @@
-
 import React from 'react';
-import type { MediaBlock } from '../types/blocks';
 
-interface MediaBlockRendererProps {
-  block: MediaBlock;
-}
-
-export const MediaBlockRenderer: React.FC<MediaBlockRendererProps> = ({ block }) => {
+export const MediaBlockRenderer = ({ block }) => {
   const renderImageWithStyle = () => {
     const { src, caption, title, text, imageStyle } = block.content;
     
@@ -114,3 +108,5 @@ export const MediaBlockRenderer: React.FC<MediaBlockRendererProps> = ({ block })
     </div>
   );
 };
+
+export default MediaBlockRenderer;

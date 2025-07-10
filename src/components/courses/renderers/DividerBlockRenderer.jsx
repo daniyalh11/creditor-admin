@@ -1,13 +1,7 @@
-
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
-import type { DividerBlock } from '../types/blocks';
 
-interface DividerBlockRendererProps {
-  block: DividerBlock;
-}
-
-export const DividerBlockRenderer: React.FC<DividerBlockRendererProps> = ({ block }) => {
+export const DividerBlockRenderer = ({ block }) => {
   switch (block.style) {
     case 'continue':
       return (
@@ -33,3 +27,5 @@ export const DividerBlockRenderer: React.FC<DividerBlockRendererProps> = ({ bloc
       return <hr className="my-8 border-gray-300" />;
   }
 };
+
+export default DividerBlockRenderer;

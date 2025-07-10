@@ -1,9 +1,7 @@
-
 import React from 'react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import type { QuoteBlock } from '../types/blocks';
 
-const getQuoteStyle = (style: string) => {
+const getQuoteStyle = (style) => {
   switch (style) {
     case 'simple':
       return 'border-l-4 border-gray-300 pl-6 text-gray-700';
@@ -18,11 +16,7 @@ const getQuoteStyle = (style: string) => {
   }
 };
 
-interface QuoteBlockRendererProps {
-  block: QuoteBlock;
-}
-
-export const QuoteBlockRenderer: React.FC<QuoteBlockRendererProps> = ({ block }) => {
+export const QuoteBlockRenderer = ({ block }) => {
   const { text, author, authorImage, backgroundImage } = block.content;
 
   const renderEnhancedQuote = () => {
@@ -148,3 +142,5 @@ export const QuoteBlockRenderer: React.FC<QuoteBlockRendererProps> = ({ block })
     </div>
   );
 };
+
+export default QuoteBlockRenderer;

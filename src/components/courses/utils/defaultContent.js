@@ -1,7 +1,4 @@
-
-import type { GalleryImage, Block } from '../types/blocks';
-
-export const getDefaultContent = (type: string) => {
+export const getDefaultContent = (type) => {
   switch (type) {
     case 'paragraph':
       return { paragraph: 'This is a sample paragraph text that would appear in your lesson content.' };
@@ -27,7 +24,7 @@ export const getDefaultContent = (type: string) => {
   }
 };
 
-export const getDefaultQuoteText = (type: string) => {
+export const getDefaultQuoteText = (type) => {
   switch (type) {
     case 'simple':
       return 'This is a simple quote.';
@@ -42,7 +39,7 @@ export const getDefaultQuoteText = (type: string) => {
   }
 };
 
-export const getDefaultListItems = (type: 'bullet' | 'numbered' | 'checklist') => {
+export const getDefaultListItems = (type) => {
   switch (type) {
     case 'bullet':
       return [
@@ -67,7 +64,7 @@ export const getDefaultListItems = (type: 'bullet' | 'numbered' | 'checklist') =
   }
 };
 
-export const getDefaultGalleryImages = (): GalleryImage[] => {
+export const getDefaultGalleryImages = () => {
   return [
     {
       id: '1',
@@ -82,7 +79,7 @@ export const getDefaultGalleryImages = (): GalleryImage[] => {
   ];
 };
 
-export const getDefaultInteractiveContent = (type: string) => {
+export const getDefaultInteractiveContent = (type) => {
   switch (type) {
     case 'accordion':
       return {
@@ -139,7 +136,7 @@ export const getDefaultInteractiveContent = (type: string) => {
   }
 };
 
-export const getDefaultDividerContent = (type: 'continue' | 'divider' | 'number' | 'space') => {
+export const getDefaultDividerContent = (type) => {
   switch (type) {
     case 'continue':
       return { label: 'Continue' };

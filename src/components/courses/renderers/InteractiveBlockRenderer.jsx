@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { AccordionComponent } from '../interactive/AccordionComponent';
 import { TabsComponent } from '../interactive/TabsComponent';
@@ -8,13 +7,8 @@ import { FlashcardComponent } from '../interactive/FlashcardComponent';
 import { TimelineComponent } from '../interactive/TimelineComponent';
 import { SortingComponent } from '../interactive/SortingComponent';
 import { ScenarioComponent } from '../interactive/ScenarioComponent';
-import type { InteractiveBlock } from '../types/blocks';
 
-interface InteractiveBlockRendererProps {
-  block: InteractiveBlock;
-}
-
-export const InteractiveBlockRenderer: React.FC<InteractiveBlockRendererProps> = ({ block }) => {
+export const InteractiveBlockRenderer = ({ block }) => {
   switch (block.style) {
     case 'accordion':
       return <AccordionComponent content={block.content} />;
@@ -40,3 +34,5 @@ export const InteractiveBlockRenderer: React.FC<InteractiveBlockRendererProps> =
       );
   }
 };
+
+export default InteractiveBlockRenderer;

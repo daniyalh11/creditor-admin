@@ -12,28 +12,8 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
-interface NewsPost {
-  id: string;
-  author: string;
-  authorInitials: string;
-  content: string;
-  timestamp: string;
-  likes: number;
-  isLiked: boolean;
-  comments: Comment[];
-  showComments: boolean;
-}
-
-interface Comment {
-  id: string;
-  author: string;
-  authorInitials: string;
-  content: string;
-  timestamp: string;
-}
-
-export const NewsSection: React.FC = () => {
-  const [posts, setPosts] = useState<NewsPost[]>([
+const NewsSection = () => {
+  const [posts, setPosts] = useState([
     {
       id: '1',
       author: 'Wiley Edwards',
@@ -60,9 +40,9 @@ export const NewsSection: React.FC = () => {
 
   const [newPost, setNewPost] = useState('');
   const [showPostForm, setShowPostForm] = useState(false);
-  const [commentTexts, setCommentTexts] = useState<{[key: string]: string}>({});
+  const [commentTexts, setCommentTexts] = useState({});
 
-  const handleLike = (postId: string) => {
+  const handleLike = (postId) => {
     setPosts(posts.map(post => 
       post.id === postId 
         ? { ...post, isLiked: !post.isLiked, likes: post.isLiked ? post.likes - 1 : post.likes + 1 }
@@ -72,7 +52,7 @@ export const NewsSection: React.FC = () => {
 
   const handleAddPost = () => {
     if (newPost.trim()) {
-      const post: NewsPost = {
+      const post = {
         id: Date.now().toString(),
         author: 'Admin User',
         authorInitials: 'Au',
@@ -89,11 +69,11 @@ export const NewsSection: React.FC = () => {
     }
   };
 
-  const handleDeletePost = (postId: string) => {
+  const handleDeletePost = (postId) => {
     setPosts(posts.filter(post => post.id !== postId));
   };
 
-  const toggleComments = (postId: string) => {
+  const toggleComments = (postId) => {
     setPosts(posts.map(post => 
       post.id === postId 
         ? { ...post, showComments: !post.showComments }
@@ -101,10 +81,10 @@ export const NewsSection: React.FC = () => {
     ));
   };
 
-  const handleAddComment = (postId: string) => {
+  const handleAddComment = (postId) => {
     const commentText = commentTexts[postId];
     if (commentText && commentText.trim()) {
-      const newComment: Comment = {
+      const newComment = {
         id: Date.now().toString(),
         author: 'Current User',
         authorInitials: 'CU',
@@ -122,13 +102,12 @@ export const NewsSection: React.FC = () => {
     }
   };
 
-  const handleCommentChange = (postId: string, value: string) => {
+  const handleCommentChange = (postId, value) => {
     setCommentTexts({ ...commentTexts, [postId]: value });
   };
 
   return (
     <div className="bg-white min-h-full">
-      {/* Header */}
       <div className="border-b border-gray-200 px-6 py-4">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold text-gray-900">News</h1>
@@ -161,7 +140,6 @@ export const NewsSection: React.FC = () => {
       </div>
 
       <div className="p-6 space-y-6">
-        {/* Post Form */}
         {showPostForm && (
           <Card className="border border-gray-200">
             <CardContent className="p-4">
@@ -193,7 +171,6 @@ export const NewsSection: React.FC = () => {
           </Card>
         )}
 
-        {/* Posts List */}
         <div className="space-y-4">
           {posts.map((post) => (
             <div key={post.id} className="bg-white border-0">
@@ -232,7 +209,6 @@ export const NewsSection: React.FC = () => {
                   </div>
                   <p className="text-sm text-gray-700 mb-3 leading-relaxed">{post.content}</p>
                   
-                  {/* Action Buttons */}
                   <div className="flex items-center gap-6">
                     <Button
                       variant="ghost"
@@ -256,10 +232,8 @@ export const NewsSection: React.FC = () => {
                     </Button>
                   </div>
 
-                  {/* Comments Section */}
                   {post.showComments && (
                     <div className="mt-4 pt-4 border-t border-gray-100">
-                      {/* Existing Comments */}
                       {post.comments.map((comment) => (
                         <div key={comment.id} className="flex items-start gap-2 mb-3">
                           <Avatar className="h-6 w-6">
@@ -279,7 +253,6 @@ export const NewsSection: React.FC = () => {
                         </div>
                       ))}
 
-                      {/* Add Comment Form */}
                       <div className="flex items-start gap-2 mt-3">
                         <Avatar className="h-6 w-6">
                           <AvatarFallback className="bg-gray-100 text-gray-600 text-xs">
@@ -318,3 +291,5 @@ export const NewsSection: React.FC = () => {
     </div>
   );
 };
+
+export default NewsSection;

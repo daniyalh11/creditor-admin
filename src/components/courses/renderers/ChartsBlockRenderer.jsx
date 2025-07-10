@@ -1,15 +1,9 @@
-
 import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, PieChart, Pie, Cell, LineChart, Line, ResponsiveContainer } from 'recharts';
-import type { ChartsBlock } from '../types/blocks';
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
 
-interface ChartsBlockRendererProps {
-  block: ChartsBlock;
-}
-
-export const ChartsBlockRenderer: React.FC<ChartsBlockRendererProps> = ({ block }) => {
+export const ChartsBlockRenderer = ({ block }) => {
   return (
     <div className="prose max-w-none">
       <div className="bg-white p-6 rounded-lg border">
@@ -59,3 +53,5 @@ export const ChartsBlockRenderer: React.FC<ChartsBlockRendererProps> = ({ block 
     </div>
   );
 };
+
+export default ChartsBlockRenderer;

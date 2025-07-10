@@ -1,12 +1,6 @@
-
 import React from 'react';
-import type { ListBlock } from '../types/blocks';
 
-interface ListBlockRendererProps {
-  block: ListBlock;
-}
-
-export const ListBlockRenderer: React.FC<ListBlockRendererProps> = ({ block }) => {
+export const ListBlockRenderer = ({ block }) => {
   return (
     <div className="prose max-w-none">
       {block.style === 'bullet' && (
@@ -43,3 +37,5 @@ export const ListBlockRenderer: React.FC<ListBlockRendererProps> = ({ block }) =
     </div>
   );
 };
+
+export default ListBlockRenderer;

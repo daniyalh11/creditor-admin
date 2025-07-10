@@ -5,7 +5,7 @@ import { ModernCourseSidebar } from '@/components/courses/ModernCourseSidebar';
 import { ModulesList } from '@/components/courses/modules/ModulesList';
 import { ModuleAssessmentsView } from '@/components/courses/ModuleAssessmentsView';
 import { CourseSettings } from '@/components/courses/CourseSettings';
-import { NewsSection } from '@/components/courses/news/NewsSection';
+import NewsSection from '@/components/courses/news/NewsSection';
 import { CalendarSection } from '@/components/courses/calendar/CalendarSection';
 import { LearnersSection } from '@/components/courses/learners/LearnersSection';
 import { InstructorsSection } from '@/components/courses/instructors/InstructorsSection';

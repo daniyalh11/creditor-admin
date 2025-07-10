@@ -1,7 +1,4 @@
-
-import type { Block, TextBlock, ListBlock, QuoteBlock, StatementBlock, DividerBlock, GalleryBlock } from '../types/blocks';
-
-export const getTemplateBlocks = (templateType: string): Block[] => {
+export const getTemplateBlocks = (templateType) => {
   const baseId = Date.now();
   
   switch (templateType) {
@@ -14,7 +11,7 @@ export const getTemplateBlocks = (templateType: string): Block[] => {
             heading: 'Welcome to Our Course',
             paragraph: 'We are excited to have you join us on this learning journey. This course will provide you with essential knowledge and skills.'
           }
-        } as TextBlock,
+        },
         {
           id: (baseId + 2).toString(),
           type: 'list',
@@ -27,7 +24,7 @@ export const getTemplateBlocks = (templateType: string): Block[] => {
               { text: 'Support resources and contact information' }
             ]
           }
-        } as ListBlock,
+        },
         {
           id: (baseId + 3).toString(),
           type: 'quote',
@@ -36,7 +33,7 @@ export const getTemplateBlocks = (templateType: string): Block[] => {
             text: 'Education is the most powerful weapon which you can use to change the world.',
             author: 'Nelson Mandela'
           }
-        } as QuoteBlock,
+        },
         {
           id: (baseId + 4).toString(),
           type: 'statement',
@@ -44,7 +41,7 @@ export const getTemplateBlocks = (templateType: string): Block[] => {
           content: {
             text: 'Let\'s begin this exciting learning adventure together!'
           }
-        } as StatementBlock
+        }
       ];
       
     case 'compliance':
@@ -56,7 +53,7 @@ export const getTemplateBlocks = (templateType: string): Block[] => {
             heading: 'Compliance Training Overview',
             paragraph: 'This training module covers essential compliance requirements and safety protocols that all employees must understand and follow.'
           }
-        } as TextBlock,
+        },
         {
           id: (baseId + 2).toString(),
           type: 'statement',
@@ -64,7 +61,7 @@ export const getTemplateBlocks = (templateType: string): Block[] => {
           content: {
             text: 'COMPLIANCE IS EVERYONE\'S RESPONSIBILITY'
           }
-        } as StatementBlock,
+        },
         {
           id: (baseId + 3).toString(),
           type: 'list',
@@ -77,7 +74,7 @@ export const getTemplateBlocks = (templateType: string): Block[] => {
               { text: 'Acknowledge receipt of training materials', checked: false }
             ]
           }
-        } as ListBlock,
+        },
         {
           id: (baseId + 4).toString(),
           type: 'divider',
@@ -85,7 +82,7 @@ export const getTemplateBlocks = (templateType: string): Block[] => {
           content: {
             label: 'Continue to Next Section'
           }
-        } as DividerBlock
+        }
       ];
       
     case 'product':
@@ -97,7 +94,7 @@ export const getTemplateBlocks = (templateType: string): Block[] => {
             heading: 'Product Training Module',
             paragraph: 'Learn about our product features, benefits, and how to effectively communicate value to customers.'
           }
-        } as TextBlock,
+        },
         {
           id: (baseId + 2).toString(),
           type: 'gallery',
@@ -121,7 +118,7 @@ export const getTemplateBlocks = (templateType: string): Block[] => {
               }
             ]
           }
-        } as GalleryBlock
+        }
       ];
       
     default:

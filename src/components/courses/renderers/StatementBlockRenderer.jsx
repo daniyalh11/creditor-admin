@@ -1,8 +1,6 @@
-
 import React from 'react';
-import type { StatementBlock } from '../types/blocks';
 
-const getStatementStyle = (style: string) => {
+const getStatementStyle = (style) => {
   switch (style) {
     case 'italic':
       // Statement A: Center-aligned with boxed layout, light grey background
@@ -21,7 +19,7 @@ const getStatementStyle = (style: string) => {
   }
 };
 
-const getTextStyle = (style: string) => {
+const getTextStyle = (style) => {
   switch (style) {
     case 'italic':
       // Statement A: Normal paragraph style
@@ -40,11 +38,7 @@ const getTextStyle = (style: string) => {
   }
 };
 
-interface StatementBlockRendererProps {
-  block: StatementBlock;
-}
-
-export const StatementBlockRenderer: React.FC<StatementBlockRendererProps> = ({ block }) => {
+export const StatementBlockRenderer = ({ block }) => {
   const renderStatement = () => {
     const text = block.content.text;
     
@@ -106,3 +100,5 @@ export const StatementBlockRenderer: React.FC<StatementBlockRendererProps> = ({ 
 
   return renderStatement();
 };
+
+export default StatementBlockRenderer;

@@ -1,12 +1,6 @@
-
 import React from 'react';
-import type { TextBlock } from '../types/blocks';
 
-interface TextBlockRendererProps {
-  block: TextBlock;
-}
-
-export const TextBlockRenderer: React.FC<TextBlockRendererProps> = ({ block }) => {
+export const TextBlockRenderer = ({ block }) => {
   switch (block.type) {
     case 'paragraph':
       return (
@@ -65,3 +59,5 @@ export const TextBlockRenderer: React.FC<TextBlockRendererProps> = ({ block }) =
       return null;
   }
 };
+
+export default TextBlockRenderer;

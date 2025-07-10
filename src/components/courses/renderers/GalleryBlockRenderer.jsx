@@ -1,8 +1,6 @@
-
 import React from 'react';
-import type { GalleryBlock } from '../types/blocks';
 
-const getGridCols = (style: string) => {
+const getGridCols = (style) => {
   switch (style) {
     case '2-column': return 'grid-cols-1 md:grid-cols-2';
     case '3-column': return 'grid-cols-1 md:grid-cols-3';
@@ -11,11 +9,7 @@ const getGridCols = (style: string) => {
   }
 };
 
-interface GalleryBlockRendererProps {
-  block: GalleryBlock;
-}
-
-export const GalleryBlockRenderer: React.FC<GalleryBlockRendererProps> = ({ block }) => {
+export const GalleryBlockRenderer = ({ block }) => {
   if (block.style === 'carousel') {
     return (
       <div className="prose max-w-none">
@@ -50,3 +44,5 @@ export const GalleryBlockRenderer: React.FC<GalleryBlockRendererProps> = ({ bloc
     </div>
   );
 };
+
+export default GalleryBlockRenderer;
