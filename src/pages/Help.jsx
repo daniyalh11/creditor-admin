@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   HelpCircle, FileText, Phone, Mail, MessageSquare, BookOpen, Video
@@ -7,6 +7,9 @@ import { PageHeader } from '@/components/shared/PageHeader';
 import { Button } from '@/components/ui/button';
 
 const Help = () => {
+  const inputRef = useRef(null);
+  const [query, setQuery] = useState('');
+
   const helpResources = [
     {
       title: "Documentation",
@@ -40,6 +43,35 @@ const Help = () => {
     }
   ];
 
+  const faqs = [
+    {
+      q: "How do I create a new course?",
+      a: "Navigate to the Courses section and click on the 'New Course' button to start the course creation process."
+    },
+    {
+      q: "How do I manage user permissions?",
+      a: "Go to the Admin section, then click on 'Permissions' to manage user roles and access rights."
+    },
+    {
+      q: "How do I export course data?",
+      a: "In the Admin section, locate the 'Export' option to download course data in various formats."
+    },
+    {
+      q: "Can I customize the dashboard?",
+      a: "Yes, you can personalize your dashboard by going to Settings and selecting Dashboard preferences."
+    }
+  ];
+
+  const filteredResources = helpResources.filter(res =>
+    res.title.toLowerCase().includes(query.toLowerCase()) ||
+    res.description.toLowerCase().includes(query.toLowerCase())
+  );
+
+  const filteredFaqs = faqs.filter(faq =>
+    faq.q.toLowerCase().includes(query.toLowerCase()) ||
+    faq.a.toLowerCase().includes(query.toLowerCase())
+  );
+
   return (
     <div className="space-y-6 animate-fade-in">
       <PageHeader
@@ -57,11 +89,17 @@ const Help = () => {
         <CardContent className="p-6">
           <div className="relative">
             <input
+              ref={inputRef}
               type="text"
               placeholder="Search for help topics..."
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
               className="w-full border rounded-lg px-4 py-3 pr-10 focus:outline-none focus:ring-2 focus:ring-primary/50"
             />
-            <Button className="absolute right-2 top-1/2 -translate-y-1/2">
+            <Button
+              className="absolute right-2 top-1/2 -translate-y-1/2"
+              onClick={() => inputRef.current?.focus()}
+            >
               Search
             </Button>
           </div>
@@ -70,7 +108,7 @@ const Help = () => {
 
       <h2 className="text-xl font-semibold mb-4">Support Options</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {helpResources.map((resource, index) => (
+        {filteredResources.map((resource, index) => (
           <Card key={index} className="hover:shadow-md transition-shadow cursor-pointer">
             <CardContent className="p-6">
               <div className="flex gap-4 items-start">
@@ -93,24 +131,7 @@ const Help = () => {
         </CardHeader>
         <CardContent className="p-0">
           <div className="divide-y">
-            {[
-              {
-                q: "How do I create a new course?",
-                a: "Navigate to the Courses section and click on the 'New Course' button to start the course creation process."
-              },
-              {
-                q: "How do I manage user permissions?",
-                a: "Go to the Admin section, then click on 'Permissions' to manage user roles and access rights."
-              },
-              {
-                q: "How do I export course data?",
-                a: "In the Admin section, locate the 'Export' option to download course data in various formats."
-              },
-              {
-                q: "Can I customize the dashboard?",
-                a: "Yes, you can personalize your dashboard by going to Settings and selecting Dashboard preferences."
-              }
-            ].map((faq, i) => (
+            {filteredFaqs.map((faq, i) => (
               <div key={i} className="p-4 hover:bg-muted/50">
                 <h4 className="font-medium mb-2">{faq.q}</h4>
                 <p className="text-muted-foreground text-sm">{faq.a}</p>

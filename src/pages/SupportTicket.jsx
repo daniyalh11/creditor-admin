@@ -18,14 +18,23 @@ import {
   X,
   FileText,
   Image,
+  CheckCircle,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog';
 
 const SupportTicket = () => {
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
   const [currentStep, setCurrentStep] = useState(1);
   const [attachedFiles, setAttachedFiles] = useState([]);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [formData, setFormData] = useState({
     category: '',
     priority: '',
@@ -113,6 +122,27 @@ const SupportTicket = () => {
       return formData.category && formData.priority && formData.subject;
     }
     return true;
+  };
+
+  const handleSubmit = () => {
+    // Here you would typically send the form data to your backend
+    // For now, we'll just show the success modal
+    setShowSuccessModal(true);
+  };
+
+  const handleSuccessModalClose = () => {
+    setShowSuccessModal(false);
+    // Reset form and navigate to help page
+    setFormData({
+      category: '',
+      priority: '',
+      subject: '',
+      description: '',
+      attachments: [],
+    });
+    setAttachedFiles([]);
+    setCurrentStep(1);
+    navigate('/help');
   };
 
   const renderStepContent = () => {
@@ -298,7 +328,7 @@ const SupportTicket = () => {
             </div>
 
             <div className="flex items-center justify-center py-6">
-              <Button size="lg" className="px-8">
+              <Button size="lg" className="px-8" onClick={handleSubmit}>
                 Submit Ticket
               </Button>
             </div>
@@ -372,6 +402,36 @@ const SupportTicket = () => {
           </Button>
         )}
       </div>
+
+      {/* Success Modal */}
+      <Dialog open={showSuccessModal} onOpenChange={setShowSuccessModal}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle className="text-center">
+              <div className="flex justify-center mb-4">
+                <CheckCircle className="h-12 w-12 text-green-500" />
+              </div>
+              <span className="text-xl">Ticket Submitted Successfully!</span>
+            </DialogTitle>
+            <DialogDescription className="text-center">
+              <p className="mt-4 text-gray-600">
+                Thank you for contacting us. Your support ticket has been submitted.
+              </p>
+              <p className="text-gray-600">
+                Our team will get back to you shortly.
+              </p>
+            </DialogDescription>
+          </DialogHeader>
+          <div className="mt-6 flex justify-center">
+            <Button 
+              onClick={handleSuccessModalClose}
+              className="px-8"
+            >
+              Close
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

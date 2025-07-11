@@ -80,7 +80,7 @@ export const PasswordResetModal = ({
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
+          {/* <div className="space-y-2">
             <Label htmlFor="currentPassword">Current Admin Password</Label>
             <Input
               id="currentPassword"
@@ -90,7 +90,7 @@ export const PasswordResetModal = ({
               required
               placeholder="Enter your current password"
             />
-          </div>
+          </div> */}
           
           <div className="space-y-2">
             <Label htmlFor="newPassword">New Password for Users</Label>
