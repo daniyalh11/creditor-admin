@@ -4,8 +4,15 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { PageHeader } from '@/components/shared/PageHeader';
-import { HelpCircle, MessageSquare, FileText, Plus } from 'lucide-react';
+import { HelpCircle, MessageSquare, FileText, Plus, Pencil, Trash2 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog';
 
 const HelpDeskSettings = () => {
   const [ticketForm, setTicketForm] = useState({
@@ -13,6 +20,43 @@ const HelpDeskSettings = () => {
     description: '',
     priority: 'medium'
   });
+
+  const [faqs, setFaqs] = useState([
+    {
+      id: 1,
+      question: "How do I reset a user's password?",
+      answer: "Go to Users > Select User > Reset Password"
+    },
+    {
+      id: 2,
+      question: "How do I add a new course?",
+      answer: "Navigate to Courses > Add New Course > Fill in details"
+    },
+    {
+      id: 3,
+      question: "How do I configure email settings?",
+      answer: "Go to Admin > Email Settings > Configure SMTP"
+    },
+    {
+      id: 4,
+      question: "How do I export user data?",
+      answer: "Visit Admin > Export > Select User Data > Download CSV"
+    }
+  ]);
+
+  const [showFaqModal, setShowFaqModal] = useState(false);
+  const [currentFaq, setCurrentFaq] = useState({
+    id: null,
+    question: '',
+    answer: ''
+  });
+  const [isEditing, setIsEditing] = useState(false);
+
+  const recentTickets = [
+    { id: '#001', subject: 'User login issues', status: 'Open', priority: 'High' },
+    { id: '#002', subject: 'Course enrollment problem', status: 'In Progress', priority: 'Medium' },
+    { id: '#003', subject: 'Email notifications not working', status: 'Resolved', priority: 'Low' }
+  ];
 
   const handleSubmitTicket = (e) => {
     e.preventDefault();
@@ -23,30 +67,48 @@ const HelpDeskSettings = () => {
     setTicketForm({ subject: '', description: '', priority: 'medium' });
   };
 
-  const faqs = [
-    {
-      question: "How do I reset a user's password?",
-      answer: "Go to Users > Select User > Reset Password"
-    },
-    {
-      question: "How do I add a new course?",
-      answer: "Navigate to Courses > Add New Course > Fill in details"
-    },
-    {
-      question: "How do I configure email settings?",
-      answer: "Go to Admin > Email Settings > Configure SMTP"
-    },
-    {
-      question: "How do I export user data?",
-      answer: "Visit Admin > Export > Select User Data > Download CSV"
-    }
-  ];
+  const handleAddFaq = () => {
+    setIsEditing(false);
+    setCurrentFaq({ id: null, question: '', answer: '' });
+    setShowFaqModal(true);
+  };
 
-  const recentTickets = [
-    { id: '#001', subject: 'User login issues', status: 'Open', priority: 'High' },
-    { id: '#002', subject: 'Course enrollment problem', status: 'In Progress', priority: 'Medium' },
-    { id: '#003', subject: 'Email notifications not working', status: 'Resolved', priority: 'Low' }
-  ];
+  const handleEditFaq = (faq) => {
+    setIsEditing(true);
+    setCurrentFaq({ ...faq });
+    setShowFaqModal(true);
+  };
+
+  const handleDeleteFaq = (id) => {
+    setFaqs(faqs.filter(faq => faq.id !== id));
+    toast({
+      title: "FAQ Deleted",
+      description: "The FAQ has been removed successfully."
+    });
+  };
+
+  const handleSaveFaq = (e) => {
+    e.preventDefault();
+    if (currentFaq.question.trim() && currentFaq.answer.trim()) {
+      if (isEditing) {
+        setFaqs(faqs.map(faq => 
+          faq.id === currentFaq.id ? currentFaq : faq
+        ));
+        toast({
+          title: "FAQ Updated",
+          description: "The FAQ has been updated successfully."
+        });
+      } else {
+        const newId = Math.max(...faqs.map(faq => faq.id), 0) + 1;
+        setFaqs([...faqs, { ...currentFaq, id: newId }]);
+        toast({
+          title: "FAQ Added",
+          description: "The new FAQ has been added successfully."
+        });
+      }
+      setShowFaqModal(false);
+    }
+  };
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -108,13 +170,35 @@ const HelpDeskSettings = () => {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            {faqs.map((faq, index) => (
-              <div key={index} className="border-l-2 border-primary pl-4">
-                <h4 className="font-medium text-sm">{faq.question}</h4>
-                <p className="text-sm text-muted-foreground mt-1">{faq.answer}</p>
+            {faqs.map((faq) => (
+              <div key={faq.id} className="border-l-2 border-primary pl-4 group">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h4 className="font-medium text-sm">{faq.question}</h4>
+                    <p className="text-sm text-muted-foreground mt-1">{faq.answer}</p>
+                  </div>
+                  <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleEditFaq(faq)}
+                      className="text-gray-500 hover:text-gray-700"
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleDeleteFaq(faq.id)}
+                      className="text-red-500 hover:text-red-700"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
               </div>
             ))}
-            <Button variant="outline" className="w-full mt-4">
+            <Button variant="outline" className="w-full mt-4" onClick={handleAddFaq}>
               <Plus className="h-4 w-4 mr-2" />
               Add FAQ
             </Button>
@@ -155,6 +239,45 @@ const HelpDeskSettings = () => {
           </div>
         </CardContent>
       </Card>
+
+      {/* FAQ Modal */}
+      <Dialog open={showFaqModal} onOpenChange={setShowFaqModal}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{isEditing ? 'Edit FAQ' : 'Add New FAQ'}</DialogTitle>
+            <DialogDescription>
+              {isEditing ? 'Update the question and answer' : 'Fill in the question and answer for the new FAQ'}
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleSaveFaq} className="space-y-4">
+            <div>
+              <label className="text-sm font-medium">Question</label>
+              <Input
+                value={currentFaq.question}
+                onChange={(e) => setCurrentFaq({ ...currentFaq, question: e.target.value })}
+                placeholder="Enter the question"
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium">Answer</label>
+              <Textarea
+                value={currentFaq.answer}
+                onChange={(e) => setCurrentFaq({ ...currentFaq, answer: e.target.value })}
+                placeholder="Enter the answer"
+                rows={4}
+              />
+            </div>
+            <div className="flex justify-end space-x-2">
+              <Button variant="outline" onClick={() => setShowFaqModal(false)}>
+                Cancel
+              </Button>
+              <Button type="submit">
+                {isEditing ? 'Update FAQ' : 'Add FAQ'}
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
