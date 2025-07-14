@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 
-export const EditCatalogDialog = ({ open, onOpenChange, catalog }) => {
+export const EditCatalogDialog = ({ open, onOpenChange, catalog, onEditCatalog }) => {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
 
@@ -22,12 +22,10 @@ export const EditCatalogDialog = ({ open, onOpenChange, catalog }) => {
   }, [catalog]);
 
   const handleUpdate = () => {
-    console.log('Updating catalog:', { 
-      id: catalog?.id, 
-      name, 
-      description 
-    });
-    // Handle update logic here
+    if (!name.trim() || !description.trim()) return;
+    if (onEditCatalog && catalog) {
+      onEditCatalog({ ...catalog, name, description });
+    }
     onOpenChange(false);
   };
 
@@ -79,6 +77,7 @@ export const EditCatalogDialog = ({ open, onOpenChange, catalog }) => {
           <Button 
             onClick={handleUpdate} 
             className="bg-blue-600 hover:bg-blue-700"
+            disabled={!name.trim() || !description.trim()}
           >
             Update Catalog
           </Button>
