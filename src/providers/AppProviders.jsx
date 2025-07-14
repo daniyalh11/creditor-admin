@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { TooltipProvider } from '../components/ui/tooltip';
@@ -8,11 +7,7 @@ import { UserFilterProvider } from '../contexts/UserFilterContext';
 
 const queryClient = new QueryClient();
 
-interface AppProvidersProps {
-  children: React.ReactNode;
-}
-
-export const AppProviders = ({ children }: AppProvidersProps) => {
+export const AppProviders = ({ children }) => {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>

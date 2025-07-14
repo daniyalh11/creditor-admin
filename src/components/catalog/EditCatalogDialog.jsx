@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 
-export const EditCatalogDialog = ({ open, onOpenChange, catalog }) => {
+export const EditCatalogDialog = ({ open, onOpenChange, catalog, onEditCatalog }) => {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
 
@@ -22,12 +22,9 @@ export const EditCatalogDialog = ({ open, onOpenChange, catalog }) => {
   }, [catalog]);
 
   const handleUpdate = () => {
-    console.log('Updating catalog:', { 
-      id: catalog?.id, 
-      name, 
-      description 
-    });
-    // Handle update logic here
+    if (onEditCatalog && catalog) {
+      onEditCatalog({ ...catalog, name, description });
+    }
     onOpenChange(false);
   };
 

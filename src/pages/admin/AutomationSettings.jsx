@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { PageHeader } from '@/components/shared/PageHeader';
 import { Button } from '@/components/ui/button';
@@ -26,12 +26,56 @@ const AutomationSettings = () => {
   const [resourceSharedActions, setResourceSharedActions] = useState([]);
   const [resourceUnsharedActions, setResourceUnsharedActions] = useState([]);
   const [groupActions, setGroupActions] = useState([]);
+  const [postActions, setPostActions] = useState([]);
+  const [replyActions, setReplyActions] = useState([]);
+
+  // Enrollment actions state
+  const [enrollmentActions, setEnrollmentActions] = useState([
+    {
+      id: '1',
+      title: 'Enroll in course Lesson 1 Understanding Legal Guarantees of Equal Protection',
+      dateAdded: 'Apr 11, 2025',
+      type: 'enrollment',
+      description: 'Automatically enroll user in this course'
+    },
+    {
+      id: '2',
+      title: 'Enroll in course Lesson 2: Equal protection laws apply in finance',
+      dateAdded: 'Apr 14, 2025',
+      type: 'enrollment',
+      description: 'Automatically enroll user in this course'
+    },
+    {
+      id: '3',
+      title: 'Enroll in course Lesson 3 How to Figure It All Out – Navigating Sovereignty-Related Legal Complexities',
+      dateAdded: 'Apr 14, 2025',
+      type: 'enrollment',
+      description: 'Automatically enroll user in this course'
+    },
+    {
+      id: '4',
+      title: 'Enroll in course Lesson 4: How to Figure It All Out – Sovereignty Explained',
+      dateAdded: 'Apr 14, 2025',
+      type: 'enrollment',
+      description: 'Automatically enroll user in this course'
+    },
+    {
+      id: '5',
+      title: 'Enroll in course Lesson 5: How Government and God Compete to Provide "Protection"',
+      dateAdded: 'Apr 14, 2025',
+      type: 'enrollment',
+      description: 'Automatically enroll user in this course'
+    }
+  ]);
 
   // Modal states
   const [showAssessmentModal, setShowAssessmentModal] = useState(false);
   const [showResourceSharedModal, setShowResourceSharedModal] = useState(false);
   const [showResourceUnsharedModal, setShowResourceUnsharedModal] = useState(false);
   const [showGroupModal, setShowGroupModal] = useState(false);
+  const [showEnrollmentModal, setShowEnrollmentModal] = useState(false);
+  const [showPostModal, setShowPostModal] = useState(false);
+  const [showReplyModal, setShowReplyModal] = useState(false);
   const [editingAction, setEditingAction] = useState(null);
   const [editModalType, setEditModalType] = useState('');
 
@@ -44,14 +88,30 @@ const AutomationSettings = () => {
     setEditModalType(type);
     
     // Open the appropriate modal based on type
-    if (type === 'assessment') {
-      setShowAssessmentModal(true);
-    } else if (type === 'resource-shared') {
-      setShowResourceSharedModal(true);
-    } else if (type === 'resource-unshared') {
-      setShowResourceUnsharedModal(true);
-    } else if (type === 'group') {
-      setShowGroupModal(true);
+    switch(type) {
+      case 'assessment':
+        setShowAssessmentModal(true);
+        break;
+      case 'resource-shared':
+        setShowResourceSharedModal(true);
+        break;
+      case 'resource-unshared':
+        setShowResourceUnsharedModal(true);
+        break;
+      case 'group':
+        setShowGroupModal(true);
+        break;
+      case 'enrollment':
+        setShowEnrollmentModal(true);
+        break;
+      case 'post':
+        setShowPostModal(true);
+        break;
+      case 'reply':
+        setShowReplyModal(true);
+        break;
+      default:
+        break;
     }
   };
 
@@ -64,14 +124,30 @@ const AutomationSettings = () => {
       };
       
       // Update the appropriate state based on type
-      if (type === 'assessment') {
-        setAssessmentActions(prev => prev.map(a => a.id === editingAction.id ? updatedAction : a));
-      } else if (type === 'resource-shared') {
-        setResourceSharedActions(prev => prev.map(a => a.id === editingAction.id ? updatedAction : a));
-      } else if (type === 'resource-unshared') {
-        setResourceUnsharedActions(prev => prev.map(a => a.id === editingAction.id ? updatedAction : a));
-      } else if (type === 'group') {
-        setGroupActions(prev => prev.map(a => a.id === editingAction.id ? updatedAction : a));
+      switch(type) {
+        case 'assessment':
+          setAssessmentActions(prev => prev.map(a => a.id === editingAction.id ? updatedAction : a));
+          break;
+        case 'resource-shared':
+          setResourceSharedActions(prev => prev.map(a => a.id === editingAction.id ? updatedAction : a));
+          break;
+        case 'resource-unshared':
+          setResourceUnsharedActions(prev => prev.map(a => a.id === editingAction.id ? updatedAction : a));
+          break;
+        case 'group':
+          setGroupActions(prev => prev.map(a => a.id === editingAction.id ? updatedAction : a));
+          break;
+        case 'enrollment':
+          setEnrollmentActions(prev => prev.map(a => a.id === editingAction.id ? updatedAction : a));
+          break;
+        case 'post':
+          setPostActions(prev => prev.map(a => a.id === editingAction.id ? updatedAction : a));
+          break;
+        case 'reply':
+          setReplyActions(prev => prev.map(a => a.id === editingAction.id ? updatedAction : a));
+          break;
+        default:
+          break;
       }
       
       toast({
@@ -91,14 +167,30 @@ const AutomationSettings = () => {
       };
       
       // Add to the appropriate state based on type
-      if (type === 'assessment') {
-        setAssessmentActions(prev => [...prev, newAction]);
-      } else if (type === 'resource-shared') {
-        setResourceSharedActions(prev => [...prev, newAction]);
-      } else if (type === 'resource-unshared') {
-        setResourceUnsharedActions(prev => [...prev, newAction]);
-      } else if (type === 'group') {
-        setGroupActions(prev => [...prev, newAction]);
+      switch(type) {
+        case 'assessment':
+          setAssessmentActions(prev => [...prev, newAction]);
+          break;
+        case 'resource-shared':
+          setResourceSharedActions(prev => [...prev, newAction]);
+          break;
+        case 'resource-unshared':
+          setResourceUnsharedActions(prev => [...prev, newAction]);
+          break;
+        case 'group':
+          setGroupActions(prev => [...prev, newAction]);
+          break;
+        case 'enrollment':
+          setEnrollmentActions(prev => [...prev, newAction]);
+          break;
+        case 'post':
+          setPostActions(prev => [...prev, newAction]);
+          break;
+        case 'reply':
+          setReplyActions(prev => [...prev, newAction]);
+          break;
+        default:
+          break;
       }
       
       toast({
@@ -110,17 +202,34 @@ const AutomationSettings = () => {
     // Reset modal states
     setEditingAction(null);
     setEditModalType('');
+    handleCloseModal();
   };
 
   const handleDeleteAction = (actionId, type) => {
-    if (type === 'assessment') {
-      setAssessmentActions(prev => prev.filter(a => a.id !== actionId));
-    } else if (type === 'resource-shared') {
-      setResourceSharedActions(prev => prev.filter(a => a.id !== actionId));
-    } else if (type === 'resource-unshared') {
-      setResourceUnsharedActions(prev => prev.filter(a => a.id !== actionId));
-    } else if (type === 'group') {
-      setGroupActions(prev => prev.filter(a => a.id !== actionId));
+    switch(type) {
+      case 'assessment':
+        setAssessmentActions(prev => prev.filter(a => a.id !== actionId));
+        break;
+      case 'resource-shared':
+        setResourceSharedActions(prev => prev.filter(a => a.id !== actionId));
+        break;
+      case 'resource-unshared':
+        setResourceUnsharedActions(prev => prev.filter(a => a.id !== actionId));
+        break;
+      case 'group':
+        setGroupActions(prev => prev.filter(a => a.id !== actionId));
+        break;
+      case 'enrollment':
+        setEnrollmentActions(prev => prev.filter(a => a.id !== actionId));
+        break;
+      case 'post':
+        setPostActions(prev => prev.filter(a => a.id !== actionId));
+        break;
+      case 'reply':
+        setReplyActions(prev => prev.filter(a => a.id !== actionId));
+        break;
+      default:
+        break;
     }
     
     toast({
@@ -134,10 +243,13 @@ const AutomationSettings = () => {
     setShowResourceSharedModal(false);
     setShowResourceUnsharedModal(false);
     setShowGroupModal(false);
+    setShowEnrollmentModal(false);
+    setShowPostModal(false);
+    setShowReplyModal(false);
     setEditingAction(null);
     setEditModalType('');
   };
-  
+
   // Courses tab content
   const renderCoursesContent = () => (
     <div className="space-y-8">
@@ -152,7 +264,9 @@ const AutomationSettings = () => {
       
       {/* Existing enrollment actions table */}
       <div className="space-y-4">
-        <h2 className="text-xl font-medium">Existing Enrollment Actions</h2>
+        <div className="flex justify-between items-center">
+          <h2 className="text-xl font-medium">Existing Enrollment Actions</h2>
+        </div>
         <Table className="bg-white border rounded-lg">
           <TableHeader>
             <TableRow>
@@ -163,42 +277,35 @@ const AutomationSettings = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            <TableRow>
-              <TableCell>Enroll in course Lesson 1 Understanding Legal Guarantees of Equal Protection</TableCell>
-              <TableCell>Apr 11, 2025</TableCell>
-              <TableCell><Button variant="ghost" size="icon"><Pencil className="h-4 w-4" /></Button></TableCell>
-              <TableCell><Button variant="ghost" size="icon"><Trash2 className="h-4 w-4" /></Button></TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell>Enroll in course Lesson 2: Equal protection laws apply in finance</TableCell>
-              <TableCell>Apr 14, 2025</TableCell>
-              <TableCell><Button variant="ghost" size="icon"><Pencil className="h-4 w-4" /></Button></TableCell>
-              <TableCell><Button variant="ghost" size="icon"><Trash2 className="h-4 w-4" /></Button></TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell>Enroll in course Lesson 3 How to Figure It All Out – Navigating Sovereignty-Related Legal Complexities</TableCell>
-              <TableCell>Apr 14, 2025</TableCell>
-              <TableCell><Button variant="ghost" size="icon"><Pencil className="h-4 w-4" /></Button></TableCell>
-              <TableCell><Button variant="ghost" size="icon"><Trash2 className="h-4 w-4" /></Button></TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell>Enroll in course Lesson 4: How to Figure It All Out – Sovereignty Explained</TableCell>
-              <TableCell>Apr 14, 2025</TableCell>
-              <TableCell><Button variant="ghost" size="icon"><Pencil className="h-4 w-4" /></Button></TableCell>
-              <TableCell><Button variant="ghost" size="icon"><Trash2 className="h-4 w-4" /></Button></TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell>Enroll in course Lesson 5: How Government and God Compete to Provide "Protection"</TableCell>
-              <TableCell>Apr 14, 2025</TableCell>
-              <TableCell><Button variant="ghost" size="icon"><Pencil className="h-4 w-4" /></Button></TableCell>
-              <TableCell><Button variant="ghost" size="icon"><Trash2 className="h-4 w-4" /></Button></TableCell>
-            </TableRow>
+            {enrollmentActions.map((action) => (
+              <TableRow key={action.id}>
+                <TableCell>{action.title}</TableCell>
+                <TableCell>{action.dateAdded}</TableCell>
+                <TableCell>
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    onClick={() => handleEditAction(action, 'enrollment')}
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                </TableCell>
+                <TableCell>
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    onClick={() => handleDeleteAction(action.id, 'enrollment')}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
           </TableBody>
         </Table>
       </div>
     </div>
   );
-
   // Modules tab content
   const renderModulesContent = () => (
     <div className="space-y-8">
@@ -330,7 +437,6 @@ const AutomationSettings = () => {
       <Button 
         className="flex items-center gap-2 bg-ca-primary hover:bg-ca-secondary text-white"
         onClick={() => {
-          console.log('Opening group modal');
           setEditingAction(null);
           setEditModalType('group');
           setShowGroupModal(true);
@@ -472,21 +578,105 @@ const AutomationSettings = () => {
   );
 
   // Forums tab content
-  const renderForumsContent = () => (
+   const renderForumsContent = () => (
     <div className="space-y-6">
-      <h2 className="text-xl font-medium mb-4">Post actions</h2>
-      <p className="mb-4 text-muted-foreground">Add actions here that should be performed when a user who is not a moderator posts to the forum.</p>
+      <div>
+        <h2 className="text-xl font-medium mb-2">Post actions</h2>
+        <p className="mb-4 text-muted-foreground">Add actions here that should be performed when a user who is not a moderator posts to the forum.</p>
+        
+        <Button 
+          className="flex items-center gap-2 bg-ca-primary hover:bg-ca-secondary text-white"
+          onClick={() => {
+            setEditingAction(null);
+            setEditModalType('post');
+            setShowPostModal(true);
+          }}
+        >
+          <Plus className="h-4 w-4" /> Add
+        </Button>
+
+        {postActions.length > 0 && (
+          <div className="mt-6">
+            <h3 className="text-lg font-medium mb-4">Current Post Actions</h3>
+            <div className="space-y-3">
+              {postActions.map((action) => (
+                <div key={action.id} className="flex items-center justify-between p-4 border rounded-lg bg-white">
+                  <div>
+                    <h4 className="font-medium">{action.title}</h4>
+                    <p className="text-sm text-gray-600">{action.description}</p>
+                    <p className="text-xs text-gray-500">Added on {action.dateAdded}</p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      onClick={() => handleEditAction(action, 'post')}
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      onClick={() => handleDeleteAction(action.id, 'post')}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
       
-      <Button className="flex items-center gap-2 bg-ca-primary hover:bg-ca-secondary text-white">
-        <Plus className="h-4 w-4" /> Add
-      </Button>
-      
-      <h2 className="text-xl font-medium mt-8 mb-4">Reply actions</h2>
-      <p className="mb-4 text-muted-foreground">Add actions here that should be performed when a user who is not a moderator replies to the forum.</p>
-      
-      <Button className="flex items-center gap-2 bg-ca-primary hover:bg-ca-secondary text-white">
-        <Plus className="h-4 w-4" /> Add
-      </Button>
+      <div className="mt-8">
+        <h2 className="text-xl font-medium mb-2">Reply actions</h2>
+        <p className="mb-4 text-muted-foreground">Add actions here that should be performed when a user who is not a moderator replies to the forum.</p>
+        
+        <Button 
+          className="flex items-center gap-2 bg-ca-primary hover:bg-ca-secondary text-white"
+          onClick={() => {
+            setEditingAction(null);
+            setEditModalType('reply');
+            setShowReplyModal(true);
+          }}
+        >
+          <Plus className="h-4 w-4" /> Add
+        </Button>
+
+        {replyActions.length > 0 && (
+          <div className="mt-6">
+            <h3 className="text-lg font-medium mb-4">Current Reply Actions</h3>
+            <div className="space-y-3">
+              {replyActions.map((action) => (
+                <div key={action.id} className="flex items-center justify-between p-4 border rounded-lg bg-white">
+                  <div>
+                    <h4 className="font-medium">{action.title}</h4>
+                    <p className="text-sm text-gray-600">{action.description}</p>
+                    <p className="text-xs text-gray-500">Added on {action.dateAdded}</p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      onClick={() => handleEditAction(action, 'reply')}
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      onClick={() => handleDeleteAction(action.id, 'reply')}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 
@@ -585,6 +775,34 @@ const AutomationSettings = () => {
         onClose={handleCloseModal}
         onSave={(actionData) => handleSaveAction(actionData, 'group')}
         title={editingAction ? "Edit Group Rule" : "Add Group Rule"}
+        actionType="general"
+        editingAction={editingAction}
+      />
+
+      {/* Enrollment Modal */}
+      <AddActionModal
+        isOpen={showEnrollmentModal}
+        onClose={handleCloseModal}
+        onSave={(actionData) => handleSaveAction(actionData, 'enrollment')}
+        title={editingAction ? "Edit Enrollment Action" : "Add Enrollment Action"}
+        actionType="enrollment"
+        editingAction={editingAction}
+      />
+      {/*Forums Modal*/}
+      <AddActionModal
+        isOpen={showPostModal}
+        onClose={handleCloseModal}
+        onSave={(actionData) => handleSaveAction(actionData, 'post')}
+        title={editingAction ? "Edit Post Action" : "Add Post Action"}
+        actionType="general"
+        editingAction={editingAction}
+      />
+
+      <AddActionModal
+        isOpen={showReplyModal}
+        onClose={handleCloseModal}
+        onSave={(actionData) => handleSaveAction(actionData, 'reply')}
+        title={editingAction ? "Edit Reply Action" : "Add Reply Action"}
         actionType="general"
         editingAction={editingAction}
       />

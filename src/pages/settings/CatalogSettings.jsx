@@ -5,7 +5,7 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from '@/lib/utils';
-import { Pencil, ImagePlus, Plus } from 'lucide-react';
+import { Pencil, ImagePlus, Plus, Trash2 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { EditIntroductionModal } from '@/components/catalog/EditIntroductionModal';
 import { AddBoxModal } from '@/components/catalog/AddBoxModal';
@@ -30,6 +30,8 @@ const CatalogSettings = () => {
   const [showSEOModal, setShowSEOModal] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [selectedCategoryId, setSelectedCategoryId] = useState(null);
+  const [editingBox, setEditingBox] = useState(null);
+  const [boxModalMode, setBoxModalMode] = useState('add');
 
   const [catalogOptions, setCatalogOptions] = useState([
     { id: "enableSearch", label: "Enable catalog search", checked: true },
@@ -112,6 +114,34 @@ const CatalogSettings = () => {
     });
   };
 
+  const handleEditBox = (updatedBox) => {
+    setBoxes(prev => prev.map(box => box.id === updatedBox.id ? updatedBox : box));
+    toast({
+      title: "Box Updated",
+      description: "Box has been updated successfully.",
+    });
+  };
+
+  const handleDeleteBox = (boxId) => {
+    setBoxes(prev => prev.filter(box => box.id !== boxId));
+    toast({
+      title: "Box Deleted",
+      description: "Box has been deleted successfully.",
+    });
+  };
+
+  const openAddBoxModal = () => {
+    setBoxModalMode('add');
+    setEditingBox(null);
+    setShowAddBoxModal(true);
+  };
+
+  const openEditBoxModal = (box) => {
+    setBoxModalMode('edit');
+    setEditingBox(box);
+    setShowAddBoxModal(true);
+  };
+
   const handleSaveCategory = (categoryData) => {
     const newCategory = {
       id: Math.max(...categories.map(c => c.id), 0) + 1,
@@ -179,7 +209,6 @@ const CatalogSettings = () => {
   };
 
   const handlePictureUpload = (categoryId) => {
-    // Create a file input element
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = 'image/*';
@@ -404,17 +433,36 @@ const CatalogSettings = () => {
               ) : (
                 <div className="space-y-2">
                   {boxes.map((box) => (
-                    <div key={box.id} className="p-3 border rounded-lg">
-                      <h4 className="font-medium">{box.title}</h4>
-                      <p className="text-sm text-gray-600">{box.description}</p>
-                      <p className="text-xs text-gray-500">Added on {box.dateAdded}</p>
+                    <div key={box.id} className="p-3 border rounded-lg flex justify-between items-start">
+                      <div className="flex-1">
+                        <h4 className="font-medium">{box.title}</h4>
+                        <p className="text-sm text-gray-600">{box.description}</p>
+                        <p className="text-xs text-gray-500">Added on {box.dateAdded}</p>
+                      </div>
+                      <div className="flex gap-2 ml-4">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => openEditBoxModal(box)}
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleDeleteBox(box.id)}
+                          className="text-red-600 hover:text-red-700"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </div>
                   ))}
                 </div>
               )}
               <Button 
                 className="mt-4 flex items-center gap-2 bg-ca-primary hover:bg-ca-secondary text-white"
-                onClick={() => setShowAddBoxModal(true)}
+                onClick={openAddBoxModal}
               >
                 <Plus className="h-4 w-4" /> Add
               </Button>
@@ -534,6 +582,10 @@ const CatalogSettings = () => {
         isOpen={showAddBoxModal}
         onClose={() => setShowAddBoxModal(false)}
         onSave={handleSaveBox}
+        onEdit={handleEditBox}
+        onDelete={handleDeleteBox}
+        editingBox={editingBox}
+        mode={boxModalMode}
       />
 
       <AddCategoryModal
