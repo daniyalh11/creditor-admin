@@ -22,6 +22,7 @@ export const EditCatalogDialog = ({ open, onOpenChange, catalog, onEditCatalog }
   }, [catalog]);
 
   const handleUpdate = () => {
+    if (!name.trim() || !description.trim()) return;
     if (onEditCatalog && catalog) {
       onEditCatalog({ ...catalog, name, description });
     }
@@ -76,6 +77,7 @@ export const EditCatalogDialog = ({ open, onOpenChange, catalog, onEditCatalog }
           <Button 
             onClick={handleUpdate} 
             className="bg-blue-600 hover:bg-blue-700"
+            disabled={!name.trim() || !description.trim()}
           >
             Update Catalog
           </Button>

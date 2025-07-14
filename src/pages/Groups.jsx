@@ -19,7 +19,8 @@ const Groups = () => {
   const [selectedType, setSelectedType] = useState('all-types');
   const navigate = useNavigate();
 
-  const groups = [
+  // Move groups to state so we can update them
+  const [groups, setGroups] = useState([
     {
       id: 1,
       name: 'Customer Service Excellence',
@@ -80,7 +81,7 @@ const Groups = () => {
       description: 'Executive leadership skills and management training',
       enrollmentStatus: 'Available'
     }
-  ];
+  ]);
 
   const filteredGroups = groups.filter(group => {
     const matchesSearch =
@@ -96,13 +97,39 @@ const Groups = () => {
   };
 
   const handleDeleteGroup = (groupId) => {
-    console.log('Delete group:', groupId);
-    // Implement deletion logic here
+    setGroups(groups.filter(group => group.id !== groupId));
   };
 
   const handleArchiveGroup = (groupId) => {
-    console.log('Archive group:', groupId);
-    // Implement archive logic here
+    setGroups(groups.map(group => 
+      group.id === groupId ? { ...group, active: false } : group
+    ));
+  };
+
+  // Function to handle adding a new group
+  const handleAddGroup = (newGroupData) => {
+    const newGroup = {
+      id: Math.max(...groups.map(g => g.id), 0) + 1, // Generate new ID
+      name: newGroupData.name,
+      type: newGroupData.type || 'Study group',
+      members: 1, // Start with 1 member (the creator)
+      active: true,
+      image: getRandomGroupImage(),
+      description: newGroupData.description || 'No description provided',
+      enrollmentStatus: 'Enrolled'
+    };
+    
+    setGroups([...groups, newGroup]);
+  };
+
+  // Helper function to get random group image
+  const getRandomGroupImage = () => {
+    const images = [
+      'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=400&h=200&fit=crop',
+      'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=400&h=200&fit=crop',
+      'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=400&h=200&fit=crop'
+    ];
+    return images[Math.floor(Math.random() * images.length)];
   };
 
   return (
@@ -262,6 +289,7 @@ const Groups = () => {
       <AddGroupDialog
         open={dialogOpen}
         onOpenChange={setDialogOpen}
+        onGroupCreated={handleAddGroup}
       />
     </div>
   );

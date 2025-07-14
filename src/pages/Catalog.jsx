@@ -84,7 +84,7 @@ const Catalog = () => {
   };
 
   return (
-    <div className="flex flex-col h-full max-h-screen overflow-hidden">
+    <div className="flex flex-col h-full">
       <div className="flex-shrink-0 p-4 space-y-4">
         <PageHeader 
           title="Course Catalog" 
@@ -111,7 +111,8 @@ const Catalog = () => {
         </div>
       </div>
 
-      <ScrollArea className="flex-1 px-4 pb-4">
+      {/* Set a fixed height for ScrollArea so it scrolls when content overflows */}
+      <ScrollArea className="flex-1 px-4 pb-4 h-[calc(100vh-180px)]">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 animate-fade-in">
           {filteredCatalogs.map((catalog) => (
             <Card 

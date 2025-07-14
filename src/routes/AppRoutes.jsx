@@ -40,6 +40,7 @@ import ContactSupport from '../pages/ContactSupport';
 import UserGuide from '../pages/UserGuide';
 import SurveyBuilder from '@/pages/SurveyBuilder';
 import Resources from '../pages/Resources';
+import SearchResults from '../pages/SearchResults';
 
 // Import group pages
 import GroupNewsPage from '../pages/groups/GroupNewsPage';
@@ -150,6 +151,7 @@ export const AppRoutes = () => {
         <Route path="/survey-builder" element={<SurveyBuilder />} />
         <Route path="/games" element={<GameSettings />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/search" element={<SearchResults />} />
         
         {/* Help & Support Routes */}
         <Route path="/help" element={<Help />} />
