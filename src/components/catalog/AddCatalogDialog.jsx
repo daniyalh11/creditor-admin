@@ -13,7 +13,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 
-export const AddCatalogDialog = ({ open, onOpenChange }) => {
+export const AddCatalogDialog = ({ open, onOpenChange, onAddCatalog }) => {
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -22,8 +22,13 @@ export const AddCatalogDialog = ({ open, onOpenChange }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log('Creating catalog:', formData);
-    // Here you would typically call an API to create the catalog
+    // Provide default image and courseCount for new catalog
+    const newCatalog = {
+      ...formData,
+      image: 'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=400&h=200&fit=crop',
+      courseCount: 0,
+    };
+    if (onAddCatalog) onAddCatalog(newCatalog);
     onOpenChange(false);
     setFormData({ name: '', description: '', active: true });
   };
