@@ -8,205 +8,6 @@ import { EnrollModal } from "@/components/courses/EnrollModal";
 import CourseGrid from "@/components/courses/CourseGrid";
 import CourseList from "@/components/courses/CourseList";
 
-// Enhanced courses data with course types and images
-const openCourses = [
-  {
-    id: "1",
-    title: "Advanced JavaScript",
-    description: "Master modern JavaScript concepts and ES6+ features",
-    category: "Web Development",
-    status: "Published",
-    courseType: "Open",
-    students: 45,
-    moduleCount: 3,
-    createdAt: "May 10, 2025",
-    lastUpdated: "May 15, 2025",
-    thumbnail: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=400&h=200&fit=crop",
-    difficulty: "Advanced",
-    duration: "8 weeks",
-    isActive: true
-  },
-  {
-    id: "2",
-    title: "React Development",
-    description: "Build modern web applications with React",
-    category: "Web Development",
-    status: "Published",
-    courseType: "Open",
-    students: 62,
-    moduleCount: 2,
-    createdAt: "May 5, 2025",
-    lastUpdated: "May 12, 2025",
-    thumbnail: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=400&h=200&fit=crop",
-    difficulty: "Intermediate",
-    duration: "10 weeks",
-    isActive: true
-  },
-  {
-    id: "3",
-    title: "Node.js Backend",
-    description: "Server-side development with Node.js and Express",
-    category: "Web Development",
-    status: "Published",
-    courseType: "Open",
-    students: 38,
-    moduleCount: 1,
-    createdAt: "May 12, 2025",
-    lastUpdated: "May 18, 2025",
-    thumbnail: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=400&h=200&fit=crop",
-    difficulty: "Intermediate",
-    duration: "6 weeks",
-    isActive: false
-  },
-  {
-    id: "4",
-    title: "CSS Grid & Flexbox",
-    description: "Master modern CSS layout techniques",
-    category: "Web Development",
-    status: "Published",
-    courseType: "Open",
-    students: 89,
-    moduleCount: 4,
-    createdAt: "May 8, 2025",
-    lastUpdated: "May 20, 2025",
-    thumbnail: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=400&h=200&fit=crop",
-    difficulty: "Beginner",
-    duration: "4 weeks",
-    isActive: true
-  },
-  {
-    id: "5",
-    title: "TypeScript Fundamentals",
-    description: "Learn TypeScript for scalable JavaScript development",
-    category: "Web Development",
-    status: "Published",
-    courseType: "Open",
-    students: 156,
-    moduleCount: 5,
-    createdAt: "May 1, 2025",
-    lastUpdated: "May 22, 2025",
-    thumbnail: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=400&h=200&fit=crop",
-    difficulty: "Intermediate",
-    duration: "6 weeks",
-    isActive: true
-  },
-  {
-    id: "6",
-    title: "Vue.js Complete Guide",
-    description: "Build interactive web applications with Vue.js",
-    category: "Web Development",
-    status: "Published",
-    courseType: "Open",
-    students: 73,
-    moduleCount: 3,
-    createdAt: "May 3, 2025",
-    lastUpdated: "May 25, 2025",
-    thumbnail: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=400&h=200&fit=crop",
-    difficulty: "Intermediate",
-    duration: "8 weeks",
-    isActive: true
-  }
-];
-
-const sequentialCourses = [
-  {
-    id: "7",
-    title: "Python for Data Science",
-    description: "Data analysis and machine learning with Python",
-    category: "Data Science",
-    status: "Published",
-    courseType: "Sequential",
-    students: 234,
-    moduleCount: 8,
-    createdAt: "May 14, 2025",
-    lastUpdated: "May 20, 2025",
-    thumbnail: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=400&h=200&fit=crop",
-    difficulty: "Beginner",
-    duration: "12 weeks",
-    isActive: true
-  },
-  {
-    id: "8",
-    title: "Machine Learning Fundamentals",
-    description: "Introduction to machine learning algorithms and techniques",
-    category: "Data Science",
-    status: "Published",
-    courseType: "Sequential",
-    students: 187,
-    moduleCount: 6,
-    createdAt: "May 16, 2025",
-    lastUpdated: "May 22, 2025",
-    thumbnail: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=400&h=200&fit=crop",
-    difficulty: "Intermediate",
-    duration: "8 weeks",
-    isActive: true
-  },
-  {
-    id: "9",
-    title: "React Native Development",
-    description: "Build cross-platform mobile apps with React Native",
-    category: "Mobile Development",
-    status: "Published",
-    courseType: "Sequential",
-    students: 145,
-    moduleCount: 7,
-    createdAt: "May 18, 2025",
-    lastUpdated: "May 24, 2025",
-    thumbnail: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=400&h=200&fit=crop",
-    difficulty: "Advanced",
-    duration: "10 weeks",
-    isActive: false
-  },
-  {
-    id: "10",
-    title: "Full Stack Development Path",
-    description: "Complete journey from frontend to backend development",
-    category: "Web Development",
-    status: "Published",
-    courseType: "Sequential",
-    students: 312,
-    moduleCount: 12,
-    createdAt: "May 11, 2025",
-    lastUpdated: "May 26, 2025",
-    thumbnail: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=400&h=200&fit=crop",
-    difficulty: "Intermediate",
-    duration: "16 weeks",
-    isActive: true
-  },
-  {
-    id: "11",
-    title: "DevOps Mastery Track",
-    description: "Learn CI/CD, Docker, Kubernetes, and cloud deployment",
-    category: "DevOps",
-    status: "Published",
-    courseType: "Sequential",
-    students: 198,
-    moduleCount: 9,
-    createdAt: "May 7, 2025",
-    lastUpdated: "May 28, 2025",
-    thumbnail: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=400&h=200&fit=crop",
-    difficulty: "Advanced",
-    duration: "14 weeks",
-    isActive: true
-  },
-  {
-    id: "12",
-    title: "UI/UX Design Journey",
-    description: "From user research to high-fidelity prototypes",
-    category: "Design",
-    status: "Published",
-    courseType: "Sequential",
-    students: 267,
-    moduleCount: 10,
-    createdAt: "May 9, 2025",
-    lastUpdated: "May 30, 2025",
-    thumbnail: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=400&h=200&fit=crop",
-    difficulty: "Beginner",
-    duration: "12 weeks",
-    isActive: true
-  }
-];
-
 const Courses = () => {
   const navigate = useNavigate();
   const [view, setView] = useState('grid');
@@ -217,6 +18,205 @@ const Courses = () => {
   const [statusFilter, setStatusFilter] = useState('all-status');
   const [isEnrollModalOpen, setIsEnrollModalOpen] = useState(false);
   const [publishedCourses, setPublishedCourses] = useState([]);
+  
+  // Convert the hardcoded arrays to state
+  const [openCourses, setOpenCourses] = useState([
+    {
+      id: "1",
+      title: "Advanced JavaScript",
+      description: "Master modern JavaScript concepts and ES6+ features",
+      category: "Web Development",
+      status: "Published",
+      courseType: "Open",
+      students: 45,
+      moduleCount: 3,
+      createdAt: "May 10, 2025",
+      lastUpdated: "May 15, 2025",
+      thumbnail: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=400&h=200&fit=crop",
+      difficulty: "Advanced",
+      duration: "8 weeks",
+      isActive: true
+    },
+    {
+      id: "2",
+      title: "React Development",
+      description: "Build modern web applications with React",
+      category: "Web Development",
+      status: "Published",
+      courseType: "Open",
+      students: 62,
+      moduleCount: 2,
+      createdAt: "May 5, 2025",
+      lastUpdated: "May 12, 2025",
+      thumbnail: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=400&h=200&fit=crop",
+      difficulty: "Intermediate",
+      duration: "10 weeks",
+      isActive: true
+    },
+    {
+      id: "3",
+      title: "Node.js Backend",
+      description: "Server-side development with Node.js and Express",
+      category: "Web Development",
+      status: "Published",
+      courseType: "Open",
+      students: 38,
+      moduleCount: 1,
+      createdAt: "May 12, 2025",
+      lastUpdated: "May 18, 2025",
+      thumbnail: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=400&h=200&fit=crop",
+      difficulty: "Intermediate",
+      duration: "6 weeks",
+      isActive: false
+    },
+    {
+      id: "4",
+      title: "CSS Grid & Flexbox",
+      description: "Master modern CSS layout techniques",
+      category: "Web Development",
+      status: "Published",
+      courseType: "Open",
+      students: 89,
+      moduleCount: 4,
+      createdAt: "May 8, 2025",
+      lastUpdated: "May 20, 2025",
+      thumbnail: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=400&h=200&fit=crop",
+      difficulty: "Beginner",
+      duration: "4 weeks",
+      isActive: true
+    },
+    {
+      id: "5",
+      title: "TypeScript Fundamentals",
+      description: "Learn TypeScript for scalable JavaScript development",
+      category: "Web Development",
+      status: "Published",
+      courseType: "Open",
+      students: 156,
+      moduleCount: 5,
+      createdAt: "May 1, 2025",
+      lastUpdated: "May 22, 2025",
+      thumbnail: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=400&h=200&fit=crop",
+      difficulty: "Intermediate",
+      duration: "6 weeks",
+      isActive: true
+    },
+    {
+      id: "6",
+      title: "Vue.js Complete Guide",
+      description: "Build interactive web applications with Vue.js",
+      category: "Web Development",
+      status: "Published",
+      courseType: "Open",
+      students: 73,
+      moduleCount: 3,
+      createdAt: "May 3, 2025",
+      lastUpdated: "May 25, 2025",
+      thumbnail: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=400&h=200&fit=crop",
+      difficulty: "Intermediate",
+      duration: "8 weeks",
+      isActive: true
+    }
+  ]);
+
+  const [sequentialCourses, setSequentialCourses] = useState([
+    {
+      id: "7",
+      title: "Python for Data Science",
+      description: "Data analysis and machine learning with Python",
+      category: "Data Science",
+      status: "Published",
+      courseType: "Sequential",
+      students: 234,
+      moduleCount: 8,
+      createdAt: "May 14, 2025",
+      lastUpdated: "May 20, 2025",
+      thumbnail: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=400&h=200&fit=crop",
+      difficulty: "Beginner",
+      duration: "12 weeks",
+      isActive: true
+    },
+    {
+      id: "8",
+      title: "Machine Learning Fundamentals",
+      description: "Introduction to machine learning algorithms and techniques",
+      category: "Data Science",
+      status: "Published",
+      courseType: "Sequential",
+      students: 187,
+      moduleCount: 6,
+      createdAt: "May 16, 2025",
+      lastUpdated: "May 22, 2025",
+      thumbnail: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=400&h=200&fit=crop",
+      difficulty: "Intermediate",
+      duration: "8 weeks",
+      isActive: true
+    },
+    {
+      id: "9",
+      title: "React Native Development",
+      description: "Build cross-platform mobile apps with React Native",
+      category: "Mobile Development",
+      status: "Published",
+      courseType: "Sequential",
+      students: 145,
+      moduleCount: 7,
+      createdAt: "May 18, 2025",
+      lastUpdated: "May 24, 2025",
+      thumbnail: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=400&h=200&fit=crop",
+      difficulty: "Advanced",
+      duration: "10 weeks",
+      isActive: false
+    },
+    {
+      id: "10",
+      title: "Full Stack Development Path",
+      description: "Complete journey from frontend to backend development",
+      category: "Web Development",
+      status: "Published",
+      courseType: "Sequential",
+      students: 312,
+      moduleCount: 12,
+      createdAt: "May 11, 2025",
+      lastUpdated: "May 26, 2025",
+      thumbnail: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=400&h=200&fit=crop",
+      difficulty: "Intermediate",
+      duration: "16 weeks",
+      isActive: true
+    },
+    {
+      id: "11",
+      title: "DevOps Mastery Track",
+      description: "Learn CI/CD, Docker, Kubernetes, and cloud deployment",
+      category: "DevOps",
+      status: "Published",
+      courseType: "Sequential",
+      students: 198,
+      moduleCount: 9,
+      createdAt: "May 7, 2025",
+      lastUpdated: "May 28, 2025",
+      thumbnail: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=400&h=200&fit=crop",
+      difficulty: "Advanced",
+      duration: "14 weeks",
+      isActive: true
+    },
+    {
+      id: "12",
+      title: "UI/UX Design Journey",
+      description: "From user research to high-fidelity prototypes",
+      category: "Design",
+      status: "Published",
+      courseType: "Sequential",
+      students: 267,
+      moduleCount: 10,
+      createdAt: "May 9, 2025",
+      lastUpdated: "May 30, 2025",
+      thumbnail: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=400&h=200&fit=crop",
+      difficulty: "Beginner",
+      duration: "12 weeks",
+      isActive: true
+    }
+  ]);
 
   // Load published courses from localStorage and refresh when component mounts or route changes
   useEffect(() => {
@@ -331,7 +331,41 @@ const Courses = () => {
 
   const handleCourseAction = (action, courseId) => {
     console.log(`${action} for course ${courseId}`);
-    // Handle different actions here
+    
+    switch (action) {
+      case 'view':
+        navigate(`/courses/view/${courseId}`);
+        break;
+        
+      case 'archive':
+        // Create updated arrays with the toggled isActive status
+        setOpenCourses(prev => prev.map(course => 
+          course.id === courseId ? { ...course, isActive: !course.isActive } : course
+        ));
+        setSequentialCourses(prev => prev.map(course => 
+          course.id === courseId ? { ...course, isActive: !course.isActive } : course
+        ));
+        setPublishedCourses(prev => prev.map(course => 
+          course.id === courseId ? { ...course, isActive: !course.isActive } : course
+        ));
+        break;
+        
+      case 'delete':
+        // Show confirmation dialog before deleting
+        if (window.confirm('Are you sure you want to delete this course? This action cannot be undone.')) {
+          // Filter out the deleted course from all arrays
+          setOpenCourses(prev => prev.filter(course => course.id !== courseId));
+          setSequentialCourses(prev => prev.filter(course => course.id !== courseId));
+          setPublishedCourses(prev => prev.filter(course => course.id !== courseId));
+          
+          console.log(`Deleted course ${courseId}`);
+          alert('Course deleted successfully!');
+        }
+        break;
+        
+      default:
+        console.warn(`Unknown action: ${action}`);
+    }
   };
 
   const handleCatalogClick = () => {
@@ -522,7 +556,7 @@ const Courses = () => {
             </p>
             {!searchQuery && (
               <Button 
-                onClick={() => navigate('/courses/create')}
+                onClick={() => navigate('/courses/create')} 
                 className="bg-blue-600 hover:bg-blue-700"
               >
                 <Plus className="h-4 w-4 mr-2" />

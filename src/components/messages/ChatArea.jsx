@@ -4,9 +4,39 @@ import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { ArrowLeft, Send, Smile, Mic, Square, Paperclip, Image, FileText } from 'lucide-react';
+import { ArrowLeft, Send, Smile, Mic, Square, Paperclip, Image, FileText, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { AttachmentPreview } from './AttachmentPreview';
+
+const waveStyle = {
+  display: 'inline-block',
+  position: 'relative',
+  height: '20px',
+  width: '20px',
+  margin: '0 2px',
+  '&:before, &:after': {
+    content: '""',
+    position: 'absolute',
+    bottom: '0',
+    width: '3px',
+    height: '5px',
+    background: 'currentColor',
+    borderRadius: '3px',
+    animation: 'wave 1.5s ease-in-out infinite',
+  },
+  '&:before': {
+    left: '4px',
+    animationDelay: '0s',
+  },
+  '&:after': {
+    left: '10px',
+    animationDelay: '0.3s',
+  },
+  '@keyframes wave': {
+    '0%, 100%': { height: '5px' },
+    '50%': { height: '20px' },
+  },
+};
 
 export const ChatArea = ({
   contact,
@@ -25,6 +55,7 @@ export const ChatArea = ({
   const audioChunksRef = useRef([]);
   const imageInputRef = useRef(null);
   const documentInputRef = useRef(null);
+  const recordingTimeRef = useRef(0);
 
   const handleSendMessage = () => {
     if (newMessage.trim() || attachments.length > 0) {
@@ -62,6 +93,11 @@ export const ChatArea = ({
 
       mediaRecorder.start();
       setIsRecording(true);
+      recordingTimeRef.current = 0;
+      const intervalId = setInterval(() => {
+        recordingTimeRef.current += 1;
+      }, 1000);
+      return () => clearInterval(intervalId);
     } catch (error) {
       console.error('Error accessing microphone:', error);
     }
@@ -249,7 +285,77 @@ export const ChatArea = ({
                   : "bg-gray-100 text-gray-900"
               )}
             >
-              {renderMessageContent(message.content)}
+              {message.type === 'voice' ? (
+                <div className={`p-3 rounded-lg max-w-xs ${message.senderId === 'current-user' ? 'bg-blue-100' : 'bg-gray-100'}`}>
+                  <div className="flex items-center">
+                    <button 
+                      onClick={() => new Audio(message.audioUrl).play()}
+                      className={`flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-full ${message.senderId === 'current-user' ? 'bg-blue-200 hover:bg-blue-300' : 'bg-gray-200 hover:bg-gray-300'} mr-3`}
+                    >
+                      <svg 
+                        xmlns="http://www.w3.org/2000/svg" 
+                        width="16" 
+                        height="16" 
+                        viewBox="0 0 24 24" 
+                        fill="none" 
+                        stroke="currentColor" 
+                        strokeWidth="2" 
+                        strokeLinecap="round" 
+                        strokeLinejoin="round"
+                        className={message.playing ? 'hidden' : 'block'}
+                      >
+                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                      </svg>
+                      <svg 
+                        xmlns="http://www.w3.org/2000/svg" 
+                        width="16" 
+                        height="16" 
+                        viewBox="0 0 24 24" 
+                        fill="none" 
+                        stroke="currentColor" 
+                        strokeWidth="2" 
+                        strokeLinecap="round" 
+                        strokeLinejoin="round"
+                        className={message.playing ? 'block' : 'hidden'}
+                      >
+                        <rect x="6" y="4" width="4" height="16"></rect>
+                        <rect x="14" y="4" width="4" height="16"></rect>
+                      </svg>
+                    </button>
+                    
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium text-gray-900">Voice message</span>
+                        <span className="text-xs text-gray-500">
+                          {message.duration || '0'}"
+                        </span>
+                      </div>
+                      
+                      <div className="flex items-center mt-1">
+                        <div className="h-1.5 bg-gray-200 rounded-full flex-1 mr-2 overflow-hidden">
+                          <div 
+                            className={`h-full rounded-full ${message.senderId === 'current-user' ? 'bg-blue-500' : 'bg-gray-500'}`} 
+                            style={{ width: message.progress || '0%' }}
+                          ></div>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center mt-1">
+                        <span className="text-xs text-gray-500">
+                          {message.timestamp}
+                        </span>
+                        {message.senderId === 'current-user' && (
+                          <span className="ml-2 text-xs text-gray-500">
+                            {message.isRead ? '✓✓' : '✓'}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                renderMessageContent(message.content)
+              )}
               <p className={cn(
                 "text-xs mt-1",
                 message.senderId === 'current-user' ? "text-blue-100" : "text-gray-500"
@@ -262,36 +368,78 @@ export const ChatArea = ({
       </div>
 
       {/* Voice Recording Preview */}
-      {audioBlob && (
-        <div className="p-4 border-t border-gray-200 bg-blue-50">
+      {isRecording ? (
+        <div className="p-4 border-t border-gray-200 bg-red-50">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="w-3 h-3 bg-blue-500 rounded-full animate-pulse"></div>
-              <span className="text-sm text-blue-700">Voice note recorded</span>
+              <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
+              <span className="text-sm text-red-700">Recording...</span>
+              <span className="text-xs text-red-500">
+                {Math.floor(recordingTimeRef.current / 60)}:{(recordingTimeRef.current % 60).toString().padStart(2, '0')}
+              </span>
             </div>
-            <div className="flex gap-2">
+            <div className="flex items-center space-x-2">
               <Button 
-                variant="outline" 
+                variant="ghost" 
                 size="sm"
+                className="text-red-600 hover:bg-red-100"
+                onClick={stopRecording}
+              >
+                <Square className="h-4 w-4 mr-1" />
+                Stop
+              </Button>
+            </div>
+          </div>
+        </div>
+      ) : audioBlob ? (
+        <div className="p-4 border-t border-gray-200 bg-blue-50">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <button 
+                onClick={() => new Audio(URL.createObjectURL(audioBlob)).play()}
+                className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 hover:bg-blue-200 text-blue-600"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                </svg>
+              </button>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center space-x-2">
+                  <span className="text-sm font-medium text-gray-900 truncate">Voice message</span>
+                  <span className="text-xs text-gray-500">
+                    {Math.floor(audioBlob.size / 1000)} KB
+                  </span>
+                </div>
+                <div className="flex items-center mt-1">
+                  <div className="h-1.5 bg-blue-200 rounded-full flex-1 mr-2 overflow-hidden">
+                    <div className="h-full bg-blue-500 rounded-full" style={{ width: '100%' }}></div>
+                  </div>
+                  <span className="text-xs text-gray-500">
+                    {Math.floor(audioBlob.size / 1000)}s
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="text-gray-500 hover:bg-gray-100"
                 onClick={() => setAudioBlob(null)}
               >
-                Cancel
+                <X className="h-4 w-4" />
               </Button>
               <Button 
-                size="sm"
-                onClick={() => {
-                  onSendMessage("🎤 Voice Note");
-                  setAudioBlob(null);
-                }}
+                size="sm" 
                 className="bg-blue-600 hover:bg-blue-700 text-white"
+                onClick={sendVoiceMessage}
               >
-                <Send className="h-4 w-4" />
                 Send
               </Button>
             </div>
           </div>
         </div>
-      )}
+      ) : null}
 
       {/* Attachment Preview */}
       {attachments.length > 0 && (
@@ -320,77 +468,38 @@ export const ChatArea = ({
 
       {/* Message Input */}
       <div className="p-4 border-t border-gray-200 bg-white">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center space-x-2">
           <Button 
             variant="ghost" 
-            size="icon"
-            className="text-gray-500 hover:text-gray-700"
+            size="icon" 
+            className={`rounded-full ${isRecording ? 'text-red-600 bg-red-100 hover:bg-red-200' : 'text-gray-600 hover:bg-gray-100'}`}
+            onClick={handleMicClick}
           >
-            <Smile className="h-4 w-4" />
+            {isRecording ? (
+              <div className="flex items-center">
+                <div className="w-2 h-2 bg-red-600 rounded-full mr-1"></div>
+                <Mic className="h-5 w-5" />
+              </div>
+            ) : (
+              <Mic className="h-5 w-5" />
+            )}
           </Button>
+          
           <Input
-            placeholder="Type a message..."
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
             onKeyPress={handleKeyPress}
-            className="flex-1"
-            disabled={isRecording}
+            placeholder="Type a message..."
+            className="flex-1 rounded-full"
           />
           
-          {/* Attachment Popover */}
-          <Popover open={isAttachmentOpen} onOpenChange={setIsAttachmentOpen}>
-            <PopoverTrigger asChild>
-              <Button 
-                variant="ghost" 
-                size="icon"
-                className="text-gray-500 hover:text-gray-700"
-              >
-                <Paperclip className="h-4 w-4" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent 
-              className="w-48 p-2 bg-white border border-gray-200 shadow-lg z-50" 
-              side="top" 
-              align="end"
-            >
-              <div className="space-y-1">
-                <Button
-                  variant="ghost"
-                  onClick={handleImageUpload}
-                  className="w-full justify-start gap-3 h-10 px-3 text-gray-700 hover:bg-gray-100"
-                >
-                  <Image className="h-4 w-4 text-blue-500" />
-                  <span className="text-sm">Images</span>
-                </Button>
-                <Button
-                  variant="ghost"
-                  onClick={handleDocumentUpload}
-                  className="w-full justify-start gap-3 h-10 px-3 text-gray-700 hover:bg-gray-100"
-                >
-                  <FileText className="h-4 w-4 text-green-500" />
-                  <span className="text-sm">Documents</span>
-                </Button>
-              </div>
-            </PopoverContent>
-          </Popover>
-          
           <Button 
-            variant="ghost" 
-            size="icon"
-            onClick={handleMicClick}
-            className={cn(
-              "text-gray-500 hover:text-gray-700 transition-colors",
-              isRecording && "bg-red-100 text-red-600 hover:bg-red-200 animate-pulse"
-            )}
-          >
-            {isRecording ? <Square className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
-          </Button>
-          <Button 
+            size="icon" 
+            className="rounded-full bg-blue-600 hover:bg-blue-700 text-white"
             onClick={handleSendMessage}
-            disabled={(!newMessage.trim() && attachments.length === 0) || isRecording}
-            className="bg-blue-600 hover:bg-blue-700 text-white"
+            disabled={!newMessage.trim() && attachments.length === 0}
           >
-            <Send className="h-4 w-4" />
+            <Send className="h-5 w-5" />
           </Button>
         </div>
       </div>
