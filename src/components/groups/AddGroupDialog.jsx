@@ -18,18 +18,35 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/hooks/use-toast";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-export function AddGroupDialog({ open, onOpenChange }) {
-  const form = useForm();
+export function AddGroupDialog({ open, onOpenChange, onGroupCreated }) {
+  const form = useForm({
+    defaultValues: {
+      name: "",
+      type: "Study group",
+      description: "",
+      capacity: 100
+    }
+  });
 
   const onSubmit = (data) => {
-    console.log("Group created:", data);
-    toast({
-      title: "Group created",
-      description: "The group has been created successfully.",
-    });
-    form.reset();
-    onOpenChange(false);
+    try {
+      onGroupCreated(data);
+      toast({
+        title: "Success!",
+        description: "Group created successfully.",
+        variant: "default",
+      });
+      form.reset();
+      onOpenChange(false);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to create group.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -43,16 +60,40 @@ export function AddGroupDialog({ open, onOpenChange }) {
             <FormField
               control={form.control}
               name="name"
+              rules={{ required: "Group name is required" }}
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Group Name</FormLabel>
+                  <FormLabel>Group Name*</FormLabel>
                   <FormControl>
-                    <Input placeholder="Enter group name" {...field} />
+                    <Input placeholder="Marketing Team" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
+            
+            <FormField
+              control={form.control}
+              name="type"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Group Type</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select type" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="Study group">Study Group</SelectItem>
+                      <SelectItem value="Interest group">Interest Group</SelectItem>
+                      <SelectItem value="Professional group">Professional Group</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </FormItem>
+              )}
+            />
+
             <FormField
               control={form.control}
               name="description"
@@ -60,12 +101,12 @@ export function AddGroupDialog({ open, onOpenChange }) {
                 <FormItem>
                   <FormLabel>Description</FormLabel>
                   <FormControl>
-                    <Input placeholder="Enter group description" {...field} />
+                    <Input placeholder="Group purpose and goals" {...field} />
                   </FormControl>
-                  <FormMessage />
                 </FormItem>
               )}
             />
+
             <FormField
               control={form.control}
               name="capacity"
@@ -79,8 +120,16 @@ export function AddGroupDialog({ open, onOpenChange }) {
                 </FormItem>
               )}
             />
-            <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+
+            <DialogFooter className="gap-2 sm:gap-0">
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={() => {
+                  form.reset();
+                  onOpenChange(false);
+                }}
+              >
                 Cancel
               </Button>
               <Button type="submit">Create Group</Button>

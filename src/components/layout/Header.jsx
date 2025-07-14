@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Bell, Search, UserRound, LogOut, X, Calendar, Inbox, Recycle } from 'lucide-react';
+import { Bell, Search, UserRound, LogOut, X, Calendar, Inbox } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -28,7 +28,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { RecycleBinModal } from '@/components/modals/RecycleBinModal';
 import { EmailInboxModal } from '@/components/modals/EmailInboxModal';
 
 export const Header = () => {
@@ -95,7 +94,6 @@ export const Header = () => {
   });
 
   const [isCalendarModalOpen, setIsCalendarModalOpen] = useState(false);
-  const [isRecycleBinOpen, setIsRecycleBinOpen] = useState(false);
   const [isEmailInboxOpen, setIsEmailInboxOpen] = useState(false);
 
   const handleNotificationClick = (id) => {
@@ -247,14 +245,15 @@ export const Header = () => {
               <span className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-red-500"></span>
             </Button>
 
-            <Button 
+            {/* Recycle Bin Button - Commented Out */}
+            {/* <Button 
               variant="ghost" 
               size="icon" 
               className="h-9 w-9 text-gray-500 hover:text-gray-700"
               onClick={() => setIsRecycleBinOpen(true)}
             >
               <Recycle className="h-5 w-5" />
-            </Button>
+            </Button> */}
             
             <Popover>
               <PopoverTrigger asChild>
@@ -271,7 +270,7 @@ export const Header = () => {
                 <div className="flex flex-col max-h-[70vh]">
                   <div className="flex items-center justify-between p-3 border-b">
                     <h3 className="font-medium">Notifications</h3>
-                    <Tabs value={activeTab} onValueChange={setActiveTab} className="w-auto">
+                    <Tabs value={activeTab} onOpenChange={setActiveTab} className="w-auto">
                       <TabsList className="grid grid-cols-3 h-8">
                         <TabsTrigger value="all" className="text-xs">All</TabsTrigger>
                         <TabsTrigger value="unread" className="text-xs">Unread</TabsTrigger>
@@ -455,10 +454,11 @@ export const Header = () => {
         </div>
       </div>
 
-      <RecycleBinModal 
+      {/* Recycle Bin Modal - Commented Out */}
+      {/* <RecycleBinModal 
         isOpen={isRecycleBinOpen} 
         onClose={() => setIsRecycleBinOpen(false)} 
-      />
+      /> */}
       <EmailInboxModal 
         isOpen={isEmailInboxOpen} 
         onClose={() => setIsEmailInboxOpen(false)} 
