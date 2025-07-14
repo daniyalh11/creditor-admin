@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Bell, Search, UserRound, LogOut, X, Calendar, Inbox, Recycle } from 'lucide-react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import {
@@ -34,6 +34,7 @@ import { EmailInboxModal } from '@/components/modals/EmailInboxModal';
 export const Header = () => {
   const { toast } = useToast();
   const location = useLocation();
+  const navigate = useNavigate();
   const { 
     isMainCollapsed, 
     isAdminSectionActive,
@@ -41,6 +42,7 @@ export const Header = () => {
   } = useSidebar();
   
   const [headerAvatar, setHeaderAvatar] = useState('/lovable-uploads/dc27ec74-b2e9-4467-8adc-6a66a52eb520.png');
+  const [mainSearch, setMainSearch] = useState('');
 
   useEffect(() => {
     const handleAvatarUpdate = (event) => {
@@ -187,6 +189,13 @@ export const Header = () => {
             <input
               placeholder="Search…"
               className="pl-10 pr-4 py-2 rounded-lg text-sm border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent w-64 bg-white"
+              value={mainSearch}
+              onChange={e => setMainSearch(e.target.value)}
+              onKeyDown={e => {
+                if (e.key === 'Enter' && mainSearch.trim()) {
+                  navigate(`/search?q=${encodeURIComponent(mainSearch.trim())}`);
+                }
+              }}
             />
           </div>
 
