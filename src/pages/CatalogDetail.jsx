@@ -24,7 +24,8 @@ const CatalogDetail = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
-  const getCatalogData = (id) => {
+  // Move catalog data to state so we can update it
+  const [catalog, setCatalog] = useState(() => {
     const catalogs = {
       '1': {
         name: 'Web Development',
@@ -77,7 +78,7 @@ const CatalogDetail = () => {
             title: 'Python for Data Science',
             description: 'Learn Python programming for data analysis',
             category: 'Programming',
-            status: 'Published' ,
+            status: 'Published',
             students: 200,
             thumbnail: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&h=200&fit=crop',
             duration: '8 weeks',
@@ -89,7 +90,7 @@ const CatalogDetail = () => {
             title: 'Machine Learning Basics',
             description: 'Introduction to machine learning concepts',
             category: 'AI/ML',
-            status: 'Published' ,
+            status: 'Published',
             students: 150,
             thumbnail: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=400&h=200&fit=crop',
             duration: '10 weeks',
@@ -125,7 +126,7 @@ const CatalogDetail = () => {
             title: 'Docker & Kubernetes',
             description: 'Container orchestration and deployment',
             category: 'Infrastructure',
-            status: 'Published' ,
+            status: 'Published',
             students: 75,
             thumbnail: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=400&h=200&fit=crop',
             duration: '6 weeks',
@@ -135,10 +136,60 @@ const CatalogDetail = () => {
         ]
       }
     };
-    return catalogs[id] || catalogs['1'];
-  };
+    return catalogs[catalogId] || catalogs['1'];
+  });
 
-  const catalog = getCatalogData(catalogId || '1');
+  // Available courses that can be added to the catalog
+  const [availableCourses, setAvailableCourses] = useState([
+    {
+      id: '8',
+      title: 'Personal Sovereignty Basics',
+      description: 'Fundamentals of personal sovereignty',
+      category: 'SOVEREIGNTY 101',
+      status: 'Published',
+      students: 28,
+      thumbnail: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=400&h=200&fit=crop',
+      duration: '4 weeks',
+      difficulty: 'Beginner',
+      isActive: true
+    },
+    {
+      id: '9',
+      title: 'Advanced Constitutional Law',
+      description: 'Deep dive into constitutional law',
+      category: 'Constitutional',
+      status: 'Published',
+      students: 22,
+      thumbnail: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=400&h=200&fit=crop',
+      duration: '8 weeks',
+      difficulty: 'Advanced',
+      isActive: true
+    },
+    {
+      id: '10',
+      title: 'Commercial Law Fundamentals',
+      description: 'Introduction to commercial law',
+      category: 'Commercial',
+      status: 'Draft',
+      students: 0,
+      thumbnail: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=400&h=200&fit=crop',
+      duration: '6 weeks',
+      difficulty: 'Intermediate',
+      isActive: false
+    },
+    {
+      id: '11',
+      title: 'Banking and Finance Law',
+      description: 'Legal aspects of banking and finance',
+      category: 'Financial',
+      status: 'Published',
+      students: 18,
+      thumbnail: 'https://images.unsplash.com/photo-1601597111158-2fceff292cdc?w=400&h=200&fit=crop',
+      duration: '5 weeks',
+      difficulty: 'Intermediate',
+      isActive: true
+    }
+  ]);
 
   const filteredCourses = catalog.courses.filter(course =>
     course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -146,7 +197,29 @@ const CatalogDetail = () => {
   );
 
   const handleRemoveCourse = (courseId) => {
-    console.log('Removing course from catalog:', courseId);
+    setCatalog(prev => ({
+      ...prev,
+      courses: prev.courses.filter(course => course.id !== courseId)
+    }));
+  };
+
+  const handleAddCourses = (courseIds) => {
+    const coursesToAdd = availableCourses.filter(course => 
+      courseIds.includes(course.id) && 
+      !catalog.courses.some(existing => existing.id === course.id)
+    );
+    
+    if (coursesToAdd.length > 0) {
+      setCatalog(prev => ({
+        ...prev,
+        courses: [...prev.courses, ...coursesToAdd]
+      }));
+      
+      // Remove added courses from available courses
+      setAvailableCourses(prev => 
+        prev.filter(course => !courseIds.includes(course.id))
+      );
+    }
   };
 
   const handleCourseClick = (courseId) => {
@@ -312,7 +385,13 @@ const CatalogDetail = () => {
         )}
       </ScrollArea>
 
-      <AddCourseToCatalogDialog open={dialogOpen} onOpenChange={setDialogOpen} catalogId={catalogId || ''} />
+      <AddCourseToCatalogDialog 
+        open={dialogOpen} 
+        onOpenChange={setDialogOpen} 
+        catalogId={catalogId || ''}
+        availableCourses={availableCourses}
+        onAddCourses={handleAddCourses}
+      />
     </div>
   );
 };
