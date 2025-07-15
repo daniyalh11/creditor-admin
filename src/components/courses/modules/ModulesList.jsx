@@ -88,7 +88,7 @@ export const ModulesList = ({
   };
 
   const editModule = (module) => {
-    navigate(`/courses/edit/${courseId}/modules/${module.id}`);
+    navigate(`/modules/edit/${module.id}`);
   };
 
   const handleSaveModule = (moduleData) => {

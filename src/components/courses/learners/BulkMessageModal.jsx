@@ -67,7 +67,8 @@ export const BulkMessageModal = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl w-[95vw] max-h-[90vh] p-0 gap-0 overflow-hidden">
+      <DialogContent className="max-w-2xl w-[95vw] max-h-[90vh] p-0 gap-0">
+        {/* Header - fixed */}
         <DialogHeader className="px-6 py-4 border-b">
           <div className="flex items-center gap-2">
             <Mail className="h-5 w-5 text-blue-600" />
@@ -75,7 +76,11 @@ export const BulkMessageModal = ({
           </div>
         </DialogHeader>
         
-        <div className="flex-1 overflow-auto p-6 space-y-6">
+        {/* Content - scrollable */}
+        <div
+          className="overflow-auto p-6 space-y-6"
+          style={{ maxHeight: 'calc(90vh - 72px - 80px)' }} // 72px header, 80px footer (adjust if needed)
+        >
           {/* Recipients */}
           <div className="space-y-3">
             <Label className="text-sm font-medium text-gray-700">
@@ -133,6 +138,7 @@ export const BulkMessageModal = ({
           </div>
         </div>
 
+        {/* Footer - fixed */}
         <div className="flex justify-end gap-3 p-6 border-t bg-white flex-shrink-0">
           <Button 
             type="button" 

@@ -73,10 +73,18 @@ const CourseGrid = ({ courses, onCourseClick, onCourseAction }) => {
               <Edit className="h-4 w-4 mr-2" />
               Edit
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onCourseAction('archive', course.id); }}>
-              <Archive className="h-4 w-4 mr-2" />
-              Archive
-            </DropdownMenuItem>
+            {/* Archive/Unarchive Option */}
+            {course.isActive ? (
+              <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onCourseAction('archive', course.id); }}>
+                <Archive className="h-4 w-4 mr-2" />
+                Archive
+              </DropdownMenuItem>
+            ) : (
+              <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onCourseAction('archive', course.id); }}>
+                <Archive className="h-4 w-4 mr-2" />
+                Unarchive
+              </DropdownMenuItem>
+            )}
             <DropdownMenuItem 
               onClick={(e) => { e.stopPropagation(); onCourseAction('delete', course.id); }}
               className="text-red-600"

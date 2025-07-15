@@ -177,12 +177,17 @@ Bob Wilson,bob.wilson@example.com,learner`;
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl w-[95vw] max-h-[90vh] p-0 gap-0 overflow-hidden">
+      <DialogContent className="max-w-2xl w-[95vw] max-h-[90vh] p-0 gap-0">
+        {/* Header - fixed */}
         <DialogHeader className="px-6 py-4 border-b">
           <DialogTitle className="text-xl font-semibold">Add Learners</DialogTitle>
         </DialogHeader>
-        
-        <div className="flex-1 overflow-auto">
+
+        {/* Content - scrollable */}
+        <div
+          className="overflow-auto"
+          style={{ maxHeight: 'calc(90vh - 72px - 80px)' }} // 72px header, 80px footer (adjust if needed)
+        >
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full h-full">
             <div className="px-6 pt-4">
               <TabsList className="grid w-full grid-cols-3">
@@ -341,11 +346,24 @@ Bob Wilson,bob.wilson@example.com,learner`;
           </Tabs>
         </div>
 
+        {/* Footer - fixed */}
         <div className="flex justify-end gap-3 p-6 border-t bg-white flex-shrink-0">
           <Button type="button" variant="outline" onClick={onClose}>Cancel</Button>
-          {activeTab === 'single' && (<Button onClick={handleSingleSubmit} disabled={!selectedUser} className="bg-blue-600 hover:bg-blue-700 text-white">Add Learner</Button>)}
-          {activeTab === 'multiple' && (<Button onClick={handleMultipleSubmit} disabled={selectedUsers.length === 0} className="bg-blue-600 hover:bg-blue-700 text-white">Add {selectedUsers.length} Learners</Button>)}
-          {activeTab === 'csv' && (<Button onClick={handleCsvSubmit} disabled={!csvData.trim()} className="bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-2"><Upload className="h-4 w-4" />Import CSV</Button>)}
+          {activeTab === 'single' && (
+            <Button onClick={handleSingleSubmit} disabled={!selectedUser} className="bg-blue-600 hover:bg-blue-700 text-white">
+              Add Learner
+            </Button>
+          )}
+          {activeTab === 'multiple' && (
+            <Button onClick={handleMultipleSubmit} disabled={selectedUsers.length === 0} className="bg-blue-600 hover:bg-blue-700 text-white">
+              Add {selectedUsers.length} Learners
+            </Button>
+          )}
+          {activeTab === 'csv' && (
+            <Button onClick={handleCsvSubmit} disabled={!csvData.trim()} className="bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-2">
+              <Upload className="h-4 w-4" />Import CSV
+            </Button>
+          )}
         </div>
       </DialogContent>
     </Dialog>
