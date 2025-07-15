@@ -15,6 +15,12 @@ import { Header } from '@/components/layout/Header';
 import { cn } from '@/lib/utils';
 import { useSidebar } from '@/contexts/SidebarContext';
 
+// Sidebar width constants
+const MAIN_SIDEBAR_EXPANDED = 256; // px, w-64
+const MAIN_SIDEBAR_COLLAPSED = 64; // px, w-16
+const COURSE_SIDEBAR_EXPANDED = 256; // px, w-64
+const COURSE_SIDEBAR_COLLAPSED = 64; // px, w-16
+
 const CourseEdit = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -98,13 +104,26 @@ const CourseEdit = () => {
   };
 
   const handleViewAssessments = (module) => {
-    setCurrentModule(module);
-    setViewingAssessments(true);
+    // Redirect to the new dedicated assessment view page
+    navigate(`/courses/edit/${course.id}/module/${module.id}/assessments-view`);
   };
 
   const handleBackToModules = () => {
     setViewingAssessments(false);
     setCurrentModule(null);
+  };
+
+  const getMainContentMargin = () => {
+    if (viewingAssessments) {
+      // Only main sidebar, expanded
+      return { marginLeft: MAIN_SIDEBAR_EXPANDED };
+    }
+    // Both sidebars visible
+    const mainSidebarWidth = MAIN_SIDEBAR_COLLAPSED;
+    const courseSidebarWidth = isCourseSidebarCollapsed
+      ? COURSE_SIDEBAR_COLLAPSED
+      : COURSE_SIDEBAR_EXPANDED;
+    return { marginLeft: mainSidebarWidth + courseSidebarWidth };
   };
 
   const renderContent = () => {
@@ -189,6 +208,12 @@ const CourseEdit = () => {
               ? "ml-32" 
               : "ml-80"
         )}>
+          
+        {/* Main Content Area - Takes remaining space */}
+        <div
+          className={cn("flex-1 transition-all duration-300")}
+          style={getMainContentMargin()}
+        ></div>
           <div className="p-6">
             {renderContent()}
           </div>
