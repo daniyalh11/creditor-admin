@@ -8,36 +8,115 @@ import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, Cart
 const Progress = () => {
   const [dateRange, setDateRange] = useState('this-month');
 
-  const stats = [
-    { title: 'Average Course Progress', value: '76%', icon: <BookOpen className="h-5 w-5 text-blue-600" />, trend: { value: 5, positive: true } },
-    { title: 'Assignment Completion', value: '82%', icon: <FileText className="h-5 w-5 text-green-600" />, trend: { value: 3, positive: true } },
-    { title: 'Active Students', value: '843', icon: <Users className="h-5 w-5 text-purple-600" />, trend: { value: 12, positive: true } },
-    { title: 'Course Engagement', value: '91%', icon: <TrendingUp className="h-5 w-5 text-orange-600" />, trend: { value: 7, positive: true } },
-  ];
+  const mockStats = {
+    'this-week': [
+      { title: 'Average Course Progress', value: '76%', icon: <BookOpen className="h-5 w-5 text-blue-600" />, trend: { value: 5, positive: true } },
+      { title: 'Assignment Completion', value: '82%', icon: <FileText className="h-5 w-5 text-green-600" />, trend: { value: 3, positive: true } },
+      { title: 'Active Students', value: '843', icon: <Users className="h-5 w-5 text-purple-600" />, trend: { value: 12, positive: true } },
+      { title: 'Course Engagement', value: '91%', icon: <TrendingUp className="h-5 w-5 text-orange-600" />, trend: { value: 7, positive: true } },
+    ],
+    'this-month': [
+      { title: 'Average Course Progress', value: '79%', icon: <BookOpen className="h-5 w-5 text-blue-600" />, trend: { value: 8, positive: true } },
+      { title: 'Assignment Completion', value: '85%', icon: <FileText className="h-5 w-5 text-green-600" />, trend: { value: 6, positive: true } },
+      { title: 'Active Students', value: '910', icon: <Users className="h-5 w-5 text-purple-600" />, trend: { value: 18, positive: true } },
+      { title: 'Course Engagement', value: '93%', icon: <TrendingUp className="h-5 w-5 text-orange-600" />, trend: { value: 10, positive: true } },
+    ],
+    'this-quarter': [
+      { title: 'Average Course Progress', value: '74%', icon: <BookOpen className="h-5 w-5 text-blue-600" />, trend: { value: 2, positive: true } },
+      { title: 'Assignment Completion', value: '80%', icon: <FileText className="h-5 w-5 text-green-600" />, trend: { value: 1, positive: true } },
+      { title: 'Active Students', value: '800', icon: <Users className="h-5 w-5 text-purple-600" />, trend: { value: 5, positive: true } },
+      { title: 'Course Engagement', value: '89%', icon: <TrendingUp className="h-5 w-5 text-orange-600" />, trend: { value: 3, positive: true } },
+    ],
+    'this-year': [
+      { title: 'Average Course Progress', value: '70%', icon: <BookOpen className="h-5 w-5 text-blue-600" />, trend: { value: -2, positive: false } },
+      { title: 'Assignment Completion', value: '75%', icon: <FileText className="h-5 w-5 text-green-600" />, trend: { value: -3, positive: false } },
+      { title: 'Active Students', value: '720', icon: <Users className="h-5 w-5 text-purple-600" />, trend: { value: -8, positive: false } },
+      { title: 'Course Engagement', value: '85%', icon: <TrendingUp className="h-5 w-5 text-orange-600" />, trend: { value: -5, positive: false } },
+    ],
+  };
 
-  const courseProgress = [
-    { course: 'Credit Analysis Fundamentals', progress: 85, color: 'bg-blue-500' },
-    { course: 'Risk Assessment Basics', progress: 92, color: 'bg-green-500' },
-    { course: 'Financial Reporting', progress: 78, color: 'bg-yellow-500' },
-    { course: 'Banking Regulations', progress: 88, color: 'bg-purple-500' },
-  ];
+  const mockUserEngagementData = {
+    'this-week': [
+      { name: 'Mon', users: 120 },
+      { name: 'Tue', users: 150 },
+      { name: 'Wed', users: 180 },
+      { name: 'Thu', users: 200 },
+      { name: 'Fri', users: 220 },
+      { name: 'Sat', users: 210 },
+      { name: 'Sun', users: 190 },
+    ],
+    'this-month': [
+      { name: 'Week 1', users: 400 },
+      { name: 'Week 2', users: 500 },
+      { name: 'Week 3', users: 600 },
+      { name: 'Week 4', users: 700 },
+    ],
+    'this-quarter': [
+      { name: 'Jan', users: 300 },
+      { name: 'Feb', users: 350 },
+      { name: 'Mar', users: 400 },
+    ],
+    'this-year': [
+      { name: 'Q1', users: 1000 },
+      { name: 'Q2', users: 1200 },
+      { name: 'Q3', users: 1400 },
+      { name: 'Q4', users: 1600 },
+    ],
+  };
 
-  const userEngagementData = [
-    { name: 'Jan', users: 400 },
-    { name: 'Feb', users: 300 },
-    { name: 'Mar', users: 500 },
-    { name: 'Apr', users: 580 },
-    { name: 'May', users: 620 },
-    { name: 'Jun', users: 700 },
-    { name: 'Jul', users: 850 },
-  ];
+  const mockCourseCompletionData = {
+    'this-week': [
+      { name: 'Credit Analysis', complete: 15, incomplete: 5 },
+      { name: 'Risk Assessment', complete: 18, incomplete: 2 },
+      { name: 'Financial Reports', complete: 12, incomplete: 8 },
+      { name: 'Banking Regs', complete: 20, incomplete: 0 },
+    ],
+    'this-month': [
+      { name: 'Credit Analysis', complete: 65, incomplete: 35 },
+      { name: 'Risk Assessment', complete: 72, incomplete: 28 },
+      { name: 'Financial Reports', complete: 58, incomplete: 42 },
+      { name: 'Banking Regs', complete: 80, incomplete: 20 },
+    ],
+    'this-quarter': [
+      { name: 'Credit Analysis', complete: 180, incomplete: 70 },
+      { name: 'Risk Assessment', complete: 200, incomplete: 50 },
+      { name: 'Financial Reports', complete: 150, incomplete: 90 },
+      { name: 'Banking Regs', complete: 220, incomplete: 30 },
+    ],
+    'this-year': [
+      { name: 'Credit Analysis', complete: 700, incomplete: 300 },
+      { name: 'Risk Assessment', complete: 800, incomplete: 200 },
+      { name: 'Financial Reports', complete: 600, incomplete: 400 },
+      { name: 'Banking Regs', complete: 900, incomplete: 100 },
+    ],
+  };
 
-  const courseCompletionData = [
-    { name: 'Credit Analysis', complete: 65, incomplete: 35 },
-    { name: 'Risk Assessment', complete: 72, incomplete: 28 },
-    { name: 'Financial Reports', complete: 58, incomplete: 42 },
-    { name: 'Banking Regs', complete: 80, incomplete: 20 },
-  ];
+  const mockCourseProgress = {
+    'this-week': [
+      { course: 'Credit Analysis Fundamentals', progress: 85, color: 'bg-blue-500' },
+      { course: 'Risk Assessment Basics', progress: 92, color: 'bg-green-500' },
+      { course: 'Financial Reporting', progress: 78, color: 'bg-yellow-500' },
+      { course: 'Banking Regulations', progress: 88, color: 'bg-purple-500' },
+    ],
+    'this-month': [
+      { course: 'Credit Analysis Fundamentals', progress: 80, color: 'bg-blue-500' },
+      { course: 'Risk Assessment Basics', progress: 90, color: 'bg-green-500' },
+      { course: 'Financial Reporting', progress: 75, color: 'bg-yellow-500' },
+      { course: 'Banking Regulations', progress: 85, color: 'bg-purple-500' },
+    ],
+    'this-quarter': [
+      { course: 'Credit Analysis Fundamentals', progress: 78, color: 'bg-blue-500' },
+      { course: 'Risk Assessment Basics', progress: 85, color: 'bg-green-500' },
+      { course: 'Financial Reporting', progress: 70, color: 'bg-yellow-500' },
+      { course: 'Banking Regulations', progress: 80, color: 'bg-purple-500' },
+    ],
+    'this-year': [
+      { course: 'Credit Analysis Fundamentals', progress: 70, color: 'bg-blue-500' },
+      { course: 'Risk Assessment Basics', progress: 75, color: 'bg-green-500' },
+      { course: 'Financial Reporting', progress: 65, color: 'bg-yellow-500' },
+      { course: 'Banking Regulations', progress: 72, color: 'bg-purple-500' },
+    ],
+  };
 
   const deviceUsageData = [
     { name: 'Desktop', value: 45, icon: Monitor },
@@ -46,6 +125,11 @@ const Progress = () => {
   ];
 
   const COLORS = ['#3b82f6', '#10b981', '#f59e0b'];
+
+  const stats = mockStats[dateRange];
+  const courseProgress = mockCourseProgress[dateRange];
+  const userEngagementData = mockUserEngagementData[dateRange];
+  const courseCompletionData = mockCourseCompletionData[dateRange];
 
   return (
     <div className="space-y-6 animate-fade-in">

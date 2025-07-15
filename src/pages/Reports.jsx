@@ -155,14 +155,16 @@ const Reports = () => {
   };
 
   const handleDownloadReport = (report) => {
-    // Simulate download action
-    console.log(`Downloading report: ${report.title}`);
-    
-    // Show success toast
-    toast.success("Report downloaded successfully", {
-      description: `${report.title} has been downloaded to your device.`,
-      duration: 4000,
-    });
+    // Generate a dummy file for the report
+    const content = `Report Title: ${report.title}\nType: ${report.type}\nTags: ${(report.tags || []).join(', ')}`;
+    const blob = new Blob([content], { type: 'text/plain' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `${report.title.replace(/\s+/g, '_') || 'report'}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(a.href);
   };
 
   const clearFilters = () => {
@@ -337,129 +339,88 @@ const Reports = () => {
           </Table>
         </CardContent>
       </Card>
-
-      {/* Generate Report Modal */}
-      <Dialog open={showGenerateReportModal} onOpenChange={setShowGenerateReportModal}>
-        <DialogContent className="sm:max-w-[500px]">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Plus className="h-5 w-5" />
-              Generate New Report
-            </DialogTitle>
-          </DialogHeader>
-          
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="report-type">Report Type *</Label>
-              <Select value={reportType} onValueChange={setReportType}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select report type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Analytics">User Analytics</SelectItem>
-                  <SelectItem value="Progress">Course Progress</SelectItem>
-                  <SelectItem value="Usage">Resource Usage</SelectItem>
-                  <SelectItem value="Assessment">Assessment Summary</SelectItem>
-                  <SelectItem value="Attendance">Attendance Report</SelectItem>
-                  <SelectItem value="Performance">Performance Report</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>Start Date</Label>
-                <Popover open={showStartDatePicker} onOpenChange={setShowStartDatePicker}>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className={cn(
-                        "w-full justify-start text-left font-normal",
-                        !startDate && "text-muted-foreground"
-                      )}
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {startDate ? format(startDate, "PPP") : <span>Start date</span>}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={startDate}
-                      onSelect={(date) => {
-                        setStartDate(date);
-                        setShowStartDatePicker(false);
-                      }}
-                      initialFocus
-                      className="p-3 pointer-events-auto"
-                    />
-                  </PopoverContent>
-                </Popover>
-              </div>
-              
-              <div className="space-y-2">
-                <Label>End Date</Label>
-                <Popover open={showEndDatePicker} onOpenChange={setShowEndDatePicker}>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className={cn(
-                        "w-full justify-start text-left font-normal",
-                        !endDate && "text-muted-foreground"
-                      )}
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {endDate ? format(endDate, "PPP") : <span>End date</span>}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={endDate}
-                      onSelect={(date) => {
-                        setEndDate(date);
-                        setShowEndDatePicker(false);
-                      }}
-                      initialFocus
-                      className="p-3 pointer-events-auto"
-                    />
-                  </PopoverContent>
-                </Popover>
-              </div>
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="report-target">Target *</Label>
-              <Select value={reportTarget} onValueChange={setReportTarget}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select target" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Users">All Users</SelectItem>
-                  <SelectItem value="Groups">Groups</SelectItem>
-                  <SelectItem value="Courses">Courses</SelectItem>
-                  <SelectItem value="Assignments">Assignments</SelectItem>
-                  <SelectItem value="Resources">Resources</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <div className="flex justify-end gap-3 pt-4 border-t">
-              <Button variant="outline" onClick={handleCancelGenerateReport}>
-                <X className="mr-2 h-4 w-4" />
-                Cancel
-              </Button>
-              <Button 
-                onClick={handleGenerateReport}
-                disabled={!reportType || !reportTarget}
-              >
-                <Plus className="mr-2 h-4 w-4" />
-                Generate Report
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+{/* Generate Report Modal */}
+<Dialog open={showGenerateReportModal} onOpenChange={setShowGenerateReportModal}>
+  <DialogContent className="sm:max-w-[500px]">
+    <DialogHeader>
+      <DialogTitle className="flex items-center gap-2">
+        <Plus className="h-5 w-5" />
+        Generate New Report
+      </DialogTitle>
+    </DialogHeader>
+    
+    <div className="space-y-4">
+      <div className="space-y-2">
+        <Label htmlFor="report-type">Report Type *</Label>
+        <Select value={reportType} onValueChange={setReportType}>
+          <SelectTrigger>
+            <SelectValue placeholder="Select report type" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="Analytics">User Analytics</SelectItem>
+            <SelectItem value="Progress">Course Progress</SelectItem>
+            <SelectItem value="Usage">Resource Usage</SelectItem>
+            <SelectItem value="Assessment">Assessment Summary</SelectItem>
+            <SelectItem value="Attendance">Attendance Report</SelectItem>
+            <SelectItem value="Performance">Performance Report</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+      
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label>Start Date</Label>
+          <Input
+            type="date"
+            value={startDate ? format(startDate, 'yyyy-MM-dd') : ''}
+            onChange={(e) => setStartDate(e.target.value ? new Date(e.target.value) : null)}
+            className="w-full"
+          />
+        </div>
+        
+        <div className="space-y-2">
+          <Label>End Date</Label>
+          <Input
+            type="date"
+            value={endDate ? format(endDate, 'yyyy-MM-dd') : ''}
+            onChange={(e) => setEndDate(e.target.value ? new Date(e.target.value) : null)}
+            className="w-full"
+          />
+        </div>
+      </div>
+      
+      <div className="space-y-2">
+        <Label htmlFor="report-target">Target *</Label>
+        <Select value={reportTarget} onValueChange={setReportTarget}>
+          <SelectTrigger>
+            <SelectValue placeholder="Select target" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="Users">All Users</SelectItem>
+            <SelectItem value="Groups">Groups</SelectItem>
+            <SelectItem value="Courses">Courses</SelectItem>
+            <SelectItem value="Assignments">Assignments</SelectItem>
+            <SelectItem value="Resources">Resources</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+      
+      <div className="flex justify-end gap-3 pt-4 border-t">
+        <Button variant="outline" onClick={handleCancelGenerateReport}>
+          <X className="mr-2 h-4 w-4" />
+          Cancel
+        </Button>
+        <Button 
+          onClick={handleGenerateReport}
+          disabled={!reportType || !reportTarget}
+        >
+          <Plus className="mr-2 h-4 w-4" />
+          Generate Report
+        </Button>
+      </div>
+    </div>
+  </DialogContent>
+</Dialog>
 
       {/* Delete Report Confirmation Modal */}
       <Dialog open={showDeleteReportModal} onOpenChange={setShowDeleteReportModal}>

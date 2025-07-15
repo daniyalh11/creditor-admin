@@ -41,6 +41,7 @@ import UserGuide from '../pages/UserGuide';
 import SurveyBuilder from '@/pages/SurveyBuilder';
 import Resources from '../pages/Resources';
 import SearchResults from '../pages/SearchResults';
+import { ModuleAssessmentsView } from '@/components/courses/ModuleAssessmentsView';
 
 // Import group pages
 import GroupNewsPage from '../pages/groups/GroupNewsPage';
@@ -80,6 +81,7 @@ import PoliciesSettings from '../pages/settings/PoliciesSettings';
 import ZoomUsSettings from '../pages/admin/ZoomUsSettings';
 import LTISettings from '../pages/admin/LTISettings';
 
+// Import Assessment Dashboards
 import DebateDashboard from '@/pages/DebateDashboard';
 import QuizDashboard from '@/pages/QuizDashboard';
 import EssayDashboard from '@/pages/EssayDashboard';
@@ -90,17 +92,22 @@ import SurveyDashboard from '@/pages/SurveyDashboard';
 export const AppRoutes = () => {
   return (
     <Routes>
-      {/* Course Edit route - standalone without AdminLayout */}
+      {/* Standalone routes without the main AdminLayout */}
       <Route path="/courses/edit/:id" element={<CourseEdit />} />
-      
-      {/* Assessment Builder route - standalone without AdminLayout */}
       <Route path="/courses/builder/:id/assessment-builder" element={<AssessmentBuilder />} />
       
+      {/* Assessment dashboard routes - also standalone */}
+      <Route path="/courses/edit/:id/debate/:debateId" element={<DebateDashboard />} />
+      <Route path="/courses/edit/:id/quiz/:quizId" element={<QuizDashboard />} />
+      <Route path="/courses/edit/:id/essay/:essayId" element={<EssayDashboard />} />
+      <Route path="/courses/edit/:id/assignment/:assignmentId" element={<AssignmentDashboard />} />
+      <Route path="/courses/edit/:id/survey/:surveyId" element={<SurveyDashboard />} />
+
+      {/* Routes wrapped in the main AdminLayout */}
       <Route element={<AdminLayout title="Dashboard" />}>
         <Route path="/" element={<Dashboard />} />
         <Route path="/courses" element={<Courses />} />
         <Route path="/courses/create" element={<CourseCreation />} />
-        {/* Add route for editing courses in creation form */}
         <Route path="/courses/create/edit" element={<CourseCreation />} />
         <Route path="/courses/builder/:id" element={<CourseBuilder />} />
         <Route path="/courses/builder/:id/units" element={<UnitsBuilder />} />
@@ -109,16 +116,16 @@ export const AppRoutes = () => {
         <Route path="/courses/:categoryId" element={<CategoryDetail />} />
         <Route path="/courses/view/:id" element={<CourseDetail />} />
         
-        {/* Module routes */}
+        <Route path="/courses/edit/:id/module/:moduleId/assessments" element={<AssessmentsBuilder />} />
+        <Route path="/courses/edit/:courseId/module/:moduleId/assessments-view" element={<ModuleAssessmentsView moduleTitle="" onBack={() => {}} />} />
+        
         <Route path="/modules/view/:id" element={<ModuleDetail />} />
         <Route path="/modules/edit/:id" element={<ModuleDetail />} />
         
-        {/* Lesson routes */}
         <Route path="/lessons/view/:id" element={<ModuleDetail />} />
         <Route path="/lessons/edit/:id" element={<LessonEditor />} />
         
         <Route path="/groups" element={<Groups />} />
-        {/* Group Detail and its sub-routes */}
         <Route path="/groups/view/:groupId" element={<GroupDetail />}>
           <Route index element={<Navigate to="news" replace />} /> 
           <Route path="overview" element={<GroupOverviewPage />} />
@@ -138,22 +145,26 @@ export const AppRoutes = () => {
         <Route path="/assignments" element={<Assignments />} />
         <Route path="/assignments/view/:id" element={<AssignmentDetail />} />
         <Route path="/assignments/edit/:id" element={<AssignmentEdit />} />
+        
         <Route path="/progress" element={<Progress />} />
         <Route path="/reports" element={<Reports />} />
         <Route path="/resources" element={<Resources />} />
+        
         <Route path="/users" element={<UsersPage />} />
         <Route path="/users/view/:id" element={<UserDetail />} />
         <Route path="/users/edit/:id" element={<UserEdit />} />
+        
         <Route path="/messages" element={<Messages />} />
+        
         <Route path="/surveys" element={<Surveys />} />
         <Route path="/surveys/view/:surveyId" element={<SurveyDetail />} />
         <Route path="/surveys/builder/:surveyId" element={<SurveyBuilder />} />
         <Route path="/survey-builder" element={<SurveyBuilder />} />
+        
         <Route path="/games" element={<GameSettings />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/search" element={<SearchResults />} />
         
-        {/* Help & Support Routes */}
         <Route path="/help" element={<Help />} />
         <Route path="/help/faqs" element={<Help />} />
         <Route path="/help/contact" element={<ContactSupport />} />
@@ -194,19 +205,11 @@ export const AppRoutes = () => {
         <Route path="/admin/tagging" element={<TaggingSettings />} />
         <Route path="/admin/zoomus" element={<ZoomUsSettings />} />
         
-        {/* Admin assignment routes */}
         <Route path="/admin/courses/:id/assignments" element={<AdminAssignmentDashboard />} />
         <Route path="/admin/courses/:id/assignments/:assignmentId" element={<AdminAssignmentDashboard />} />
         
         <Route path="/admin/*" element={<Admin />} />
       </Route>
-      
-      {/* Assessment dashboard routes - standalone without AdminLayout */}
-      <Route path="/courses/edit/:id/debate/:debateId" element={<DebateDashboard />} />
-      <Route path="/courses/edit/:id/quiz/:quizId" element={<QuizDashboard />} />
-      <Route path="/courses/edit/:id/essay/:essayId" element={<EssayDashboard />} />
-      <Route path="/courses/edit/:id/assignment/:assignmentId" element={<AssignmentDashboard />} />
-      <Route path="/courses/edit/:id/survey/:surveyId" element={<SurveyDashboard />} />
       
       <Route path="*" element={<NotFound />} />
     </Routes>

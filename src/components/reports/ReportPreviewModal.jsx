@@ -120,6 +120,33 @@ export const ReportPreviewModal = ({
 
   const mockData = generateMockData(report.type);
 
+  const handleExport = (format) => {
+    let content = '';
+    let mimeType = 'text/plain';
+    let extension = 'txt';
+    if (format === 'pdf') {
+      content = `Report Title: ${report.title}\nType: ${report.type}\nGenerated: ${report.generatedDate}\n\nSummary:\n` + (mockData.summary ? mockData.summary.map(item => `${item.label}: ${item.value} (${item.change})`).join('\n') : '');
+      mimeType = 'application/pdf';
+      extension = 'pdf';
+    } else if (format === 'excel') {
+      content = `Label\tValue\tChange\n` + (mockData.summary ? mockData.summary.map(item => `${item.label}\t${item.value}\t${item.change}`).join('\n') : '');
+      mimeType = 'application/vnd.ms-excel';
+      extension = 'xls';
+    } else if (format === 'csv') {
+      content = `Label,Value,Change\n` + (mockData.summary ? mockData.summary.map(item => `${item.label},${item.value},${item.change}`).join('\n') : '');
+      mimeType = 'text/csv';
+      extension = 'csv';
+    }
+    const blob = new Blob([content], { type: mimeType });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `${report.title.replace(/\s+/g, '_') || 'report'}.${extension}`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(a.href);
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-6xl w-[95vw] h-[90vh] p-0 gap-0 flex flex-col">
@@ -311,13 +338,13 @@ export const ReportPreviewModal = ({
                   <div>
                     <h4 className="font-medium mb-2">Export Options</h4>
                     <div className="space-y-2">
-                      <Button variant="outline" size="sm" className="w-full">
+                      <Button variant="outline" size="sm" className="w-full" onClick={() => handleExport('pdf')}>
                         Export as PDF
                       </Button>
-                      <Button variant="outline" size="sm" className="w-full">
+                      <Button variant="outline" size="sm" className="w-full" onClick={() => handleExport('excel')}>
                         Export as Excel
                       </Button>
-                      <Button variant="outline" size="sm" className="w-full">
+                      <Button variant="outline" size="sm" className="w-full" onClick={() => handleExport('csv')}>
                         Export as CSV
                       </Button>
                     </div>
