@@ -66,6 +66,9 @@ export const RichTextEditor = ({
     if (editorRef.current && editorRef.current.innerHTML !== value) {
       editorRef.current.innerHTML = value;
     }
+    // Only set content on mount or when value changes from outside
+    // Do not set on every keystroke
+    // eslint-disable-next-line
   }, [value]);
 
   const handleFormatClick = (command, value) => {
@@ -269,17 +272,16 @@ export const RichTextEditor = ({
         </div>
 
         {/* Editor Content */}
-        <div 
+        <div
           ref={editorRef}
           contentEditable
           className="p-4 min-h-[200px] focus:outline-none"
-          dangerouslySetInnerHTML={{ __html: value }}
           onInput={(e) => onChange(e.currentTarget.innerHTML)}
           onBlur={(e) => onChange(e.currentTarget.innerHTML)}
           onMouseUp={checkActiveStates}
           onKeyUp={checkActiveStates}
           suppressContentEditableWarning={true}
-          placeholder={placeholder}
+          data-placeholder={placeholder}
         />
         
         <div className="border-t p-2 text-right text-xs text-gray-500">
