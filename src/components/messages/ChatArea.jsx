@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -7,6 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { ArrowLeft, Send, Smile, Mic, Square, Paperclip, Image, FileText, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { AttachmentPreview } from './AttachmentPreview';
+import { toast } from 'sonner';
 
 const waveStyle = {
   display: 'inline-block',
@@ -51,11 +52,31 @@ export const ChatArea = ({
   const [attachments, setAttachments] = useState([]);
   const [isDocumentModalOpen, setIsDocumentModalOpen] = useState(false);
   const [selectedDocument, setSelectedDocument] = useState(null);
+  const [recordingTime, setRecordingTime] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentAudio, setCurrentAudio] = useState(null);
+  const [microphoneError, setMicrophoneError] = useState(null);
+  
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
   const imageInputRef = useRef(null);
   const documentInputRef = useRef(null);
-  const recordingTimeRef = useRef(0);
+  const recordingIntervalRef = useRef(null);
+  const audioRef = useRef(null);
+
+  useEffect(() => {
+    return () => {
+      if (recordingIntervalRef.current) {
+        clearInterval(recordingIntervalRef.current);
+      }
+      if (currentAudio) {
+        currentAudio.pause();
+      }
+      if (audioBlob) {
+        URL.revokeObjectURL(URL.createObjectURL(audioBlob));
+      }
+    };
+  }, [currentAudio, audioBlob]);
 
   const handleSendMessage = () => {
     if (newMessage.trim() || attachments.length > 0) {
@@ -74,6 +95,7 @@ export const ChatArea = ({
 
   const startRecording = async () => {
     try {
+      setMicrophoneError(null);
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       const mediaRecorder = new MediaRecorder(stream);
       mediaRecorderRef.current = mediaRecorder;
@@ -91,15 +113,23 @@ export const ChatArea = ({
         stream.getTracks().forEach(track => track.stop());
       };
 
-      mediaRecorder.start();
+      mediaRecorder.start(100);
       setIsRecording(true);
-      recordingTimeRef.current = 0;
-      const intervalId = setInterval(() => {
-        recordingTimeRef.current += 1;
+      setRecordingTime(0);
+      
+      recordingIntervalRef.current = setInterval(() => {
+        setRecordingTime(prev => prev + 1);
       }, 1000);
-      return () => clearInterval(intervalId);
     } catch (error) {
       console.error('Error accessing microphone:', error);
+      if (error.name === 'NotAllowedError') {
+        setMicrophoneError('Microphone access was denied. Please allow microphone access to record voice messages.');
+        toast.error('Microphone access was denied');
+      } else {
+        setMicrophoneError('Error accessing microphone. Please check your microphone settings.');
+        toast.error('Error accessing microphone');
+      }
+      setIsRecording(false);
     }
   };
 
@@ -107,6 +137,9 @@ export const ChatArea = ({
     if (mediaRecorderRef.current && isRecording) {
       mediaRecorderRef.current.stop();
       setIsRecording(false);
+      if (recordingIntervalRef.current) {
+        clearInterval(recordingIntervalRef.current);
+      }
     }
   };
 
@@ -119,11 +152,50 @@ export const ChatArea = ({
   };
 
   const sendVoiceMessage = () => {
-    if (audioBlob) {
-      const voiceMessage = "🎤 Voice Note";
+    if (!audioBlob) {
+      toast.error('No audio recorded');
+      return;
+    }
+
+    try {
+      const audioUrl = URL.createObjectURL(audioBlob);
+      const duration = recordingTime;
+      
+      const voiceMessage = {
+        id: Date.now().toString(),
+        content: { type: 'voice', duration, audioUrl },
+        senderId: 'current-user',
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        type: 'voice',
+        audioUrl,
+        duration,
+        isRead: false,
+        progress: '0%'
+      };
+      
       onSendMessage(voiceMessage);
       setAudioBlob(null);
+      setRecordingTime(0);
+    } catch (error) {
+      console.error('Error sending voice message:', error);
+      toast.error('Failed to send voice message');
     }
+  };
+
+  const playAudio = (audioUrl) => {
+    if (currentAudio) {
+      currentAudio.pause();
+    }
+    
+    const audio = new Audio(audioUrl);
+    audioRef.current = audio;
+    setCurrentAudio(audio);
+    
+    audio.addEventListener('play', () => setIsPlaying(true));
+    audio.addEventListener('pause', () => setIsPlaying(false));
+    audio.addEventListener('ended', () => setIsPlaying(false));
+    
+    audio.play().catch(e => console.error('Error playing audio:', e));
   };
 
   const handleImageUpload = () => {
@@ -185,6 +257,14 @@ export const ChatArea = ({
   };
 
   const parseMessageAttachments = (content) => {
+    // Handle cases where content is not a string
+    if (typeof content !== 'string') {
+      return {
+        text: '',
+        attachments: []
+      };
+    }
+
     const lines = content.split('\n');
     const textLines = lines.filter(line => !line.startsWith('📷') && !line.startsWith('📄'));
     const attachmentLines = lines.filter(line => line.startsWith('📷') || line.startsWith('📄'));
@@ -208,37 +288,63 @@ export const ChatArea = ({
   };
 
   const renderMessageContent = (content) => {
-    const { text, attachments: messageAttachments } = parseMessageAttachments(content);
-    
-    return (
-      <div>
-        {text && <p className="text-sm mb-2">{text}</p>}
-        {messageAttachments.length > 0 && (
-          <div className="space-y-2">
-            <AttachmentPreview
-              attachments={messageAttachments}
-              variant="message"
-            />
-            {messageAttachments.some(att => att.type === 'document') && (
-              <Button
-                variant="outline"
-                size="sm"
-                className="mt-2"
-                onClick={() => {
-                  const docAttachment = messageAttachments.find(att => att.type === 'document');
-                  if (docAttachment) {
-                    handleOpenDocument(docAttachment);
-                  }
-                }}
-              >
-                <FileText className="h-4 w-4 mr-2" />
-                Open Document
-              </Button>
-            )}
-          </div>
-        )}
-      </div>
-    );
+    // Handle cases where content is null/undefined
+    if (content == null) {
+      return null;
+    }
+
+    // Handle voice messages differently
+    if (typeof content === 'object' && content.type === 'voice') {
+      return (
+        <div className="text-sm mb-2">
+          🎤 Voice message ({formatTime(content.duration || 0)})
+        </div>
+      );
+    }
+
+    // Handle string content
+    if (typeof content === 'string') {
+      const { text, attachments: messageAttachments } = parseMessageAttachments(content);
+      
+      return (
+        <div>
+          {text && <p className="text-sm mb-2">{text}</p>}
+          {messageAttachments.length > 0 && (
+            <div className="space-y-2">
+              <AttachmentPreview
+                attachments={messageAttachments}
+                variant="message"
+              />
+              {messageAttachments.some(att => att.type === 'document') && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="mt-2"
+                  onClick={() => {
+                    const docAttachment = messageAttachments.find(att => att.type === 'document');
+                    if (docAttachment) {
+                      handleOpenDocument(docAttachment);
+                    }
+                  }}
+                >
+                  <FileText className="h-4 w-4 mr-2" />
+                  Open Document
+                </Button>
+              )}
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    // Fallback for other content types
+    return <p className="text-sm mb-2">{String(content)}</p>;
+  };
+
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
   };
 
   return (
@@ -290,45 +396,46 @@ export const ChatArea = ({
                   <div className={`p-3 rounded-lg max-w-xs ${message.senderId === 'current-user' ? 'bg-blue-100' : 'bg-gray-100'}`}>
                     <div className="flex items-center">
                       <button 
-                        onClick={() => new Audio(message.audioUrl).play()}
+                        onClick={() => playAudio(message.audioUrl)}
                         className={`flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-full ${message.senderId === 'current-user' ? 'bg-blue-200 hover:bg-blue-300' : 'bg-gray-200 hover:bg-gray-300'} mr-3`}
                       >
-                        <svg 
-                          xmlns="http://www.w3.org/2000/svg" 
-                          width="16" 
-                          height="16" 
-                          viewBox="0 0 24 24" 
-                          fill="none" 
-                          stroke="currentColor" 
-                          strokeWidth="2" 
-                          strokeLinecap="round" 
-                          strokeLinejoin="round"
-                          className={message.playing ? 'hidden' : 'block'}
-                        >
-                          <polygon points="5 3 19 12 5 21 5 3"></polygon>
-                        </svg>
-                        <svg 
-                          xmlns="http://www.w3.org/2000/svg" 
-                          width="16" 
-                          height="16" 
-                          viewBox="0 0 24 24" 
-                          fill="none" 
-                          stroke="currentColor" 
-                          strokeWidth="2" 
-                          strokeLinecap="round" 
-                          strokeLinejoin="round"
-                          className={message.playing ? 'block' : 'hidden'}
-                        >
-                          <rect x="6" y="4" width="4" height="16"></rect>
-                          <rect x="14" y="4" width="4" height="16"></rect>
-                        </svg>
+                        {isPlaying && currentAudio && currentAudio.src === message.audioUrl ? (
+                          <svg 
+                            xmlns="http://www.w3.org/2000/svg" 
+                            width="16" 
+                            height="16" 
+                            viewBox="0 0 24 24" 
+                            fill="none" 
+                            stroke="currentColor" 
+                            strokeWidth="2" 
+                            strokeLinecap="round" 
+                            strokeLinejoin="round"
+                          >
+                            <rect x="6" y="4" width="4" height="16"></rect>
+                            <rect x="14" y="4" width="4" height="16"></rect>
+                          </svg>
+                        ) : (
+                          <svg 
+                            xmlns="http://www.w3.org/2000/svg" 
+                            width="16" 
+                            height="16" 
+                            viewBox="0 0 24 24" 
+                            fill="none" 
+                            stroke="currentColor" 
+                            strokeWidth="2" 
+                            strokeLinecap="round" 
+                            strokeLinejoin="round"
+                          >
+                            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                          </svg>
+                        )}
                       </button>
                       
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between">
                           <span className="text-sm font-medium text-gray-900">Voice message</span>
                           <span className="text-xs text-gray-500">
-                            {message.duration || '0'}"
+                            {formatTime(message.duration || 0)}
                           </span>
                         </div>
                         
@@ -377,7 +484,7 @@ export const ChatArea = ({
               <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
               <span className="text-sm text-red-700">Recording...</span>
               <span className="text-xs text-red-500">
-                {Math.floor(recordingTimeRef.current / 60)}:{(recordingTimeRef.current % 60).toString().padStart(2, '0')}
+                {formatTime(recordingTime)}
               </span>
             </div>
             <div className="flex items-center space-x-2">
@@ -398,12 +505,19 @@ export const ChatArea = ({
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <button 
-                onClick={() => new Audio(URL.createObjectURL(audioBlob)).play()}
+                onClick={() => playAudio(URL.createObjectURL(audioBlob))}
                 className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 hover:bg-blue-200 text-blue-600"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <polygon points="5 3 19 12 5 21 5 3"></polygon>
-                </svg>
+                {isPlaying && currentAudio && currentAudio.src === URL.createObjectURL(audioBlob) ? (
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="6" y="4" width="4" height="16"></rect>
+                    <rect x="14" y="4" width="4" height="16"></rect>
+                  </svg>
+                ) : (
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                  </svg>
+                )}
               </button>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center space-x-2">
@@ -417,7 +531,7 @@ export const ChatArea = ({
                     <div className="h-full bg-blue-500 rounded-full" style={{ width: '100%' }}></div>
                   </div>
                   <span className="text-xs text-gray-500">
-                    {Math.floor(audioBlob.size / 1000)}s
+                    {formatTime(recordingTime)}
                   </span>
                 </div>
               </div>
@@ -427,7 +541,13 @@ export const ChatArea = ({
                 variant="ghost" 
                 size="icon" 
                 className="text-gray-500 hover:bg-gray-100"
-                onClick={() => setAudioBlob(null)}
+                onClick={() => {
+                  setAudioBlob(null);
+                  setRecordingTime(0);
+                  if (currentAudio) {
+                    currentAudio.pause();
+                  }
+                }}
               >
                 <X className="h-4 w-4" />
               </Button>
@@ -470,6 +590,12 @@ export const ChatArea = ({
 
       {/* Message Input */}
       <div className="p-4 border-t border-gray-200 bg-white">
+        {microphoneError && (
+          <div className="mb-2 p-2 bg-red-50 text-red-600 text-sm rounded-md">
+            {microphoneError}
+          </div>
+        )}
+        
         <div className="flex items-center space-x-2">
           <Button 
             variant="ghost" 
