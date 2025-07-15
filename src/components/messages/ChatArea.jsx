@@ -243,8 +243,8 @@ export const ChatArea = ({
 
   return (
     <div className="flex flex-col h-full">
-      {/* Chat Header */}
-      <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-white">
+      {/* Chat Header - Fixed at top */}
+      <div className="flex-shrink-0 p-4 border-b border-gray-200 bg-white">
         <div className="flex items-center gap-3">
           <Button 
             variant="ghost" 
@@ -267,104 +267,106 @@ export const ChatArea = ({
         </div>
       </div>
 
-      {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        {messages.map((message) => (
-          <div
-            key={message.id}
-            className={cn(
-              "flex",
-              message.senderId === 'current-user' ? "justify-end" : "justify-start"
-            )}
-          >
+      {/* Messages Area - Scrollable content */}
+      <div className="flex-1 overflow-y-auto">
+        <div className="p-4 space-y-4">
+          {messages.map((message) => (
             <div
+              key={message.id}
               className={cn(
-                "max-w-xs lg:max-w-md px-4 py-2 rounded-lg",
-                message.senderId === 'current-user'
-                  ? "bg-blue-500 text-white"
-                  : "bg-gray-100 text-gray-900"
+                "flex",
+                message.senderId === 'current-user' ? "justify-end" : "justify-start"
               )}
             >
-              {message.type === 'voice' ? (
-                <div className={`p-3 rounded-lg max-w-xs ${message.senderId === 'current-user' ? 'bg-blue-100' : 'bg-gray-100'}`}>
-                  <div className="flex items-center">
-                    <button 
-                      onClick={() => new Audio(message.audioUrl).play()}
-                      className={`flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-full ${message.senderId === 'current-user' ? 'bg-blue-200 hover:bg-blue-300' : 'bg-gray-200 hover:bg-gray-300'} mr-3`}
-                    >
-                      <svg 
-                        xmlns="http://www.w3.org/2000/svg" 
-                        width="16" 
-                        height="16" 
-                        viewBox="0 0 24 24" 
-                        fill="none" 
-                        stroke="currentColor" 
-                        strokeWidth="2" 
-                        strokeLinecap="round" 
-                        strokeLinejoin="round"
-                        className={message.playing ? 'hidden' : 'block'}
+              <div
+                className={cn(
+                  "max-w-xs lg:max-w-md px-4 py-2 rounded-lg",
+                  message.senderId === 'current-user'
+                    ? "bg-blue-500 text-white"
+                    : "bg-gray-100 text-gray-900"
+                )}
+              >
+                {message.type === 'voice' ? (
+                  <div className={`p-3 rounded-lg max-w-xs ${message.senderId === 'current-user' ? 'bg-blue-100' : 'bg-gray-100'}`}>
+                    <div className="flex items-center">
+                      <button 
+                        onClick={() => new Audio(message.audioUrl).play()}
+                        className={`flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-full ${message.senderId === 'current-user' ? 'bg-blue-200 hover:bg-blue-300' : 'bg-gray-200 hover:bg-gray-300'} mr-3`}
                       >
-                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
-                      </svg>
-                      <svg 
-                        xmlns="http://www.w3.org/2000/svg" 
-                        width="16" 
-                        height="16" 
-                        viewBox="0 0 24 24" 
-                        fill="none" 
-                        stroke="currentColor" 
-                        strokeWidth="2" 
-                        strokeLinecap="round" 
-                        strokeLinejoin="round"
-                        className={message.playing ? 'block' : 'hidden'}
-                      >
-                        <rect x="6" y="4" width="4" height="16"></rect>
-                        <rect x="14" y="4" width="4" height="16"></rect>
-                      </svg>
-                    </button>
-                    
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium text-gray-900">Voice message</span>
-                        <span className="text-xs text-gray-500">
-                          {message.duration || '0'}"
-                        </span>
-                      </div>
+                        <svg 
+                          xmlns="http://www.w3.org/2000/svg" 
+                          width="16" 
+                          height="16" 
+                          viewBox="0 0 24 24" 
+                          fill="none" 
+                          stroke="currentColor" 
+                          strokeWidth="2" 
+                          strokeLinecap="round" 
+                          strokeLinejoin="round"
+                          className={message.playing ? 'hidden' : 'block'}
+                        >
+                          <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                        </svg>
+                        <svg 
+                          xmlns="http://www.w3.org/2000/svg" 
+                          width="16" 
+                          height="16" 
+                          viewBox="0 0 24 24" 
+                          fill="none" 
+                          stroke="currentColor" 
+                          strokeWidth="2" 
+                          strokeLinecap="round" 
+                          strokeLinejoin="round"
+                          className={message.playing ? 'block' : 'hidden'}
+                        >
+                          <rect x="6" y="4" width="4" height="16"></rect>
+                          <rect x="14" y="4" width="4" height="16"></rect>
+                        </svg>
+                      </button>
                       
-                      <div className="flex items-center mt-1">
-                        <div className="h-1.5 bg-gray-200 rounded-full flex-1 mr-2 overflow-hidden">
-                          <div 
-                            className={`h-full rounded-full ${message.senderId === 'current-user' ? 'bg-blue-500' : 'bg-gray-500'}`} 
-                            style={{ width: message.progress || '0%' }}
-                          ></div>
-                        </div>
-                      </div>
-                      
-                      <div className="flex items-center mt-1">
-                        <span className="text-xs text-gray-500">
-                          {message.timestamp}
-                        </span>
-                        {message.senderId === 'current-user' && (
-                          <span className="ml-2 text-xs text-gray-500">
-                            {message.isRead ? '✓✓' : '✓'}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm font-medium text-gray-900">Voice message</span>
+                          <span className="text-xs text-gray-500">
+                            {message.duration || '0'}"
                           </span>
-                        )}
+                        </div>
+                        
+                        <div className="flex items-center mt-1">
+                          <div className="h-1.5 bg-gray-200 rounded-full flex-1 mr-2 overflow-hidden">
+                            <div 
+                              className={`h-full rounded-full ${message.senderId === 'current-user' ? 'bg-blue-500' : 'bg-gray-500'}`} 
+                              style={{ width: message.progress || '0%' }}
+                            ></div>
+                          </div>
+                        </div>
+                        
+                        <div className="flex items-center mt-1">
+                          <span className="text-xs text-gray-500">
+                            {message.timestamp}
+                          </span>
+                          {message.senderId === 'current-user' && (
+                            <span className="ml-2 text-xs text-gray-500">
+                              {message.isRead ? '✓✓' : '✓'}
+                            </span>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              ) : (
-                renderMessageContent(message.content)
-              )}
-              <p className={cn(
-                "text-xs mt-1",
-                message.senderId === 'current-user' ? "text-blue-100" : "text-gray-500"
-              )}>
-                {message.timestamp}
-              </p>
+                ) : (
+                  renderMessageContent(message.content)
+                )}
+                <p className={cn(
+                  "text-xs mt-1",
+                  message.senderId === 'current-user' ? "text-blue-100" : "text-gray-500"
+                )}>
+                  {message.timestamp}
+                </p>
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
 
       {/* Voice Recording Preview */}

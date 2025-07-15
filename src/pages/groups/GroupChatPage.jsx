@@ -240,9 +240,9 @@ const GroupChatPage = () => {
   };
 
   return (
-    <div className="flex flex-col h-full">
-      {/* Group Chat Header */}
-      <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-white">
+    <div className="flex flex-col h-screen">
+      {/* Group Chat Header - Fixed at top */}
+      <div className="flex-shrink-0 p-4 border-b border-gray-200 bg-white">
         <div className="flex items-center gap-3">
           <h1 className="text-2xl font-bold text-gray-900">Web Development</h1>
           <Dialog open={showParticipants} onOpenChange={setShowParticipants}>
@@ -278,92 +278,80 @@ const GroupChatPage = () => {
         </div>
       </div>
 
-      {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
-        {messages.map((message) => (
-          <div
-            key={message.id}
-            className={cn(
-              "flex gap-3",
-              message.isCurrentUser ? "justify-end" : "justify-start"
-            )}
-          >
-            {!message.isCurrentUser && (
-              <Avatar className="h-10 w-10">
-                <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white font-medium">
-                  {getInitials(message.senderName)}
-                </AvatarFallback>
-              </Avatar>
-            )}
-            
-            <div className={cn(
-              "flex flex-col",
-              message.isCurrentUser ? "items-end" : "items-start"
-            )}>
+      {/* Messages Area - Scrollable content */}
+      <div className="flex-1 overflow-y-auto bg-gray-50">
+        <div className="p-4 space-y-4">
+          {messages.map((message) => (
+            <div
+              key={message.id}
+              className={cn(
+                "flex gap-3",
+                message.isCurrentUser ? "justify-end" : "justify-start"
+              )}
+            >
               {!message.isCurrentUser && (
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="text-sm font-medium text-gray-900">{message.senderName}</span>
-                  <span className="text-xs text-gray-500">{message.timestamp}</span>
-                </div>
+                <Avatar className="h-10 w-10">
+                  <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white font-medium">
+                    {getInitials(message.senderName)}
+                  </AvatarFallback>
+                </Avatar>
               )}
               
-              <div
-                className={cn(
-                  "max-w-xs lg:max-w-md px-4 py-2 rounded-lg",
-                  message.isCurrentUser
-                    ? "bg-purple-500 text-white"
-                    : "bg-white text-gray-900 border border-gray-200"
+              <div className={cn(
+                "flex flex-col",
+                message.isCurrentUser ? "items-end" : "items-start"
+              )}>
+                {!message.isCurrentUser && (
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-sm font-medium text-gray-900">{message.senderName}</span>
+                    <span className="text-xs text-gray-500">{message.timestamp}</span>
+                  </div>
                 )}
-              >
-                {renderMessageContent(message.content)}
+                
+                <div
+                  className={cn(
+                    "max-w-xs lg:max-w-md px-4 py-2 rounded-lg",
+                    message.isCurrentUser
+                      ? "bg-purple-500 text-white"
+                      : "bg-white text-gray-900 border border-gray-200"
+                  )}
+                >
+                  {renderMessageContent(message.content)}
+                </div>
+                
+                {message.isCurrentUser && (
+                  <div className="flex items-center gap-2 mt-1">
+                    <span className="text-xs text-gray-500">{message.timestamp}</span>
+                    <span className="text-xs text-gray-500">Y</span>
+                  </div>
+                )}
               </div>
               
               {message.isCurrentUser && (
-                <div className="flex items-center gap-2 mt-1">
-                  <span className="text-xs text-gray-500">{message.timestamp}</span>
-                  <span className="text-xs text-gray-500">Y</span>
-                </div>
+                <Avatar className="h-10 w-10">
+                  <AvatarFallback className="bg-gradient-to-br from-green-500 to-blue-600 text-white font-medium">
+                    {getInitials(message.senderName)}
+                  </AvatarFallback>
+                </Avatar>
               )}
             </div>
-            
-            {message.isCurrentUser && (
-              <Avatar className="h-10 w-10">
-                <AvatarFallback className="bg-gradient-to-br from-green-500 to-blue-600 text-white font-medium">
-                  {getInitials(message.senderName)}
-                </AvatarFallback>
-              </Avatar>
-            )}
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
 
-      {/* Attachment Preview */}
+      {/* Attachment Preview - Fixed at bottom */}
       {attachments.length > 0 && (
-        <AttachmentPreview
-          attachments={attachments}
-          onRemove={handleRemoveAttachment}
-          variant="preview"
-        />
+        <div className="border-t border-gray-200 bg-white">
+          <AttachmentPreview
+            attachments={attachments}
+            onRemove={handleRemoveAttachment}
+            variant="preview"
+          />
+        </div>
       )}
 
-      {/* Hidden File Inputs */}
-      <input
-        ref={imageInputRef}
-        type="file"
-        accept="image/*"
-        onChange={handleImageChange}
-        className="hidden"
-      />
-      <input
-        ref={documentInputRef}
-        type="file"
-        accept=".pdf,.doc,.docx,.txt,.xls,.xlsx,.ppt,.pptx"
-        onChange={handleDocumentChange}
-        className="hidden"
-      />
-
-      {/* Message Input */}
-      <div className="p-4 border-t border-gray-200 bg-white">
+      {/* Message Input - Fixed at bottom */}
+      <div className="border-t border-gray-200 bg-white p-4">
         <div className="flex items-center gap-2">
           <Button 
             variant="ghost" 
@@ -430,6 +418,22 @@ const GroupChatPage = () => {
           </Button>
         </div>
       </div>
+
+      {/* Hidden File Inputs */}
+      <input
+        ref={imageInputRef}
+        type="file"
+        accept="image/*"
+        onChange={handleImageChange}
+        className="hidden"
+      />
+      <input
+        ref={documentInputRef}
+        type="file"
+        accept=".pdf,.doc,.docx,.txt,.xls,.xlsx,.ppt,.pptx"
+        onChange={handleDocumentChange}
+        className="hidden"
+      />
 
       {/* Document Modal */}
       <Dialog open={isDocumentModalOpen} onOpenChange={setIsDocumentModalOpen}>
