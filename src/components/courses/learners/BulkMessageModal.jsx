@@ -68,14 +68,11 @@ export const BulkMessageModal = ({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl w-[95vw] max-h-[90vh] p-0 gap-0 overflow-hidden">
-        <DialogHeader className="px-6 py-4 border-b flex-shrink-0 flex flex-row items-center justify-between space-y-0">
+        <DialogHeader className="px-6 py-4 border-b">
           <div className="flex items-center gap-2">
             <Mail className="h-5 w-5 text-blue-600" />
             <DialogTitle className="text-xl font-semibold">Send Message</DialogTitle>
           </div>
-          <Button variant="ghost" size="icon" onClick={() => onOpenChange(false)}>
-            <X className="h-4 w-4" />
-          </Button>
         </DialogHeader>
         
         <div className="flex-1 overflow-auto p-6 space-y-6">
