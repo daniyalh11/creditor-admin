@@ -14,41 +14,15 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Search, BookOpen } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
-export const AddCourseToCatalogDialog = ({ open, onOpenChange, catalogId }) => {
+export const AddCourseToCatalogDialog = ({ 
+  open, 
+  onOpenChange, 
+  catalogId,
+  availableCourses,
+  onAddCourses
+}) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCourses, setSelectedCourses] = useState([]);
-
-  // Mock available courses
-  const availableCourses = [
-    {
-      id: '4',
-      title: 'Personal Sovereignty Basics',
-      category: 'SOVEREIGNTY 101',
-      status: 'Published',
-      students: 28
-    },
-    {
-      id: '5',
-      title: 'Advanced Constitutional Law',
-      category: 'Constitutional',
-      status: 'Published',
-      students: 22
-    },
-    {
-      id: '6',
-      title: 'Commercial Law Fundamentals',
-      category: 'Commercial',
-      status: 'Draft',
-      students: 0
-    },
-    {
-      id: '7',
-      title: 'Banking and Finance Law',
-      category: 'Financial',
-      status: 'Published',
-      students: 18
-    }
-  ];
 
   const filteredCourses = availableCourses.filter(course =>
     course.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -64,11 +38,12 @@ export const AddCourseToCatalogDialog = ({ open, onOpenChange, catalogId }) => {
   };
 
   const handleSubmit = () => {
-    console.log('Adding courses to catalog:', { catalogId, courseIds: selectedCourses });
-    // Here you would typically call an API to add courses to catalog
-    onOpenChange(false);
-    setSelectedCourses([]);
-    setSearchTerm('');
+    if (selectedCourses.length > 0) {
+      onAddCourses(selectedCourses);
+      setSelectedCourses([]);
+      setSearchTerm('');
+      onOpenChange(false);
+    }
   };
 
   return (
@@ -144,7 +119,11 @@ export const AddCourseToCatalogDialog = ({ open, onOpenChange, catalogId }) => {
         </div>
 
         <DialogFooter className="flex-shrink-0">
-          <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+          <Button type="button" variant="outline" onClick={() => {
+            setSelectedCourses([]);
+            setSearchTerm('');
+            onOpenChange(false);
+          }}>
             Cancel
           </Button>
           <Button 
