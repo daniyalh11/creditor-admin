@@ -150,18 +150,38 @@ const Resources = () => {
     }
   };
 
+  const downloadResource = (resource) => {
+    if (resource.type === 'link' && resource.url) {
+      // Download a .url file
+      const urlContent = `[InternetShortcut]\nURL=${resource.url}`;
+      const blob = new Blob([urlContent], { type: 'text/plain' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `${resource.title || 'resource'}.url`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(a.href);
+    } else {
+      // Download a dummy file (simulate file download)
+      const content = `Title: ${resource.title}\nDescription: ${resource.description || ''}`;
+      const blob = new Blob([content], { type: 'text/plain' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = resource.fileName || `${resource.title || 'resource'}.txt`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(a.href);
+    }
+  };
+
   const handleExportSelected = () => {
     if (selectedResources.length === 0) {
       toast.error("Please select resources to export");
       return;
     }
-    
-    const selectedResourceNames = resources
-      .filter(r => selectedResources.includes(r.id))
-      .map(r => r.title)
-      .join(', ');
-    
-    toast.success(`Exporting ${selectedResources.length} resources: ${selectedResourceNames}`);
+    resources.filter(r => selectedResources.includes(r.id)).forEach(downloadResource);
   };
 
   // New function to handle resource added from the modal
@@ -421,7 +441,7 @@ const Resources = () => {
                     >
                       <Eye className="h-4 w-4" />
                     </Button>
-                    <Button variant="ghost" size="sm">
+                    <Button variant="ghost" size="sm" onClick={() => downloadResource(resource)}>
                       <Download className="h-4 w-4" />
                     </Button>
                     <Button 

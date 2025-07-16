@@ -159,7 +159,7 @@ export const UserDetailsModal = ({
 
   return (
     <>
-      <Dialog open={open} onOpenChange={onOpenChange}>
+      <Dialog open={open && !showMessageModal} onOpenChange={onOpenChange}>
         <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto" hideCloseButton={false}>
           <DialogHeader>
             <DialogTitle>User Details</DialogTitle>
@@ -331,12 +331,14 @@ export const UserDetailsModal = ({
         </DialogContent>
       </Dialog>
 
-      <MessageModal
-        isOpen={showMessageModal}
-        onClose={() => setShowMessageModal(false)}
-        userName={user.name}
-        onSendMessage={handleSendMessage}
-      />
+      {showMessageModal && (
+        <MessageModal
+          isOpen={showMessageModal}
+          onClose={() => setShowMessageModal(false)}
+          userName={user.name}
+          onSendMessage={handleSendMessage}
+        />
+      )}
     </>
   );
 };
