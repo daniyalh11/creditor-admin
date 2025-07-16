@@ -78,7 +78,7 @@ export const ChatSidebar = ({
               </p>
             </div>
 
-            {contact.unreadCount && (
+            {contact.unreadCount > 0 && (
               <div className="bg-blue-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
                 {contact.unreadCount}
               </div>

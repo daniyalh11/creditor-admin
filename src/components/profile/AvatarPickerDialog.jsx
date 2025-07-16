@@ -229,6 +229,93 @@ const svgAvatars = [
   }
 ];
 
+// Add CameraCaptureModal component for desktop webcam capture
+function CameraCaptureModal({ open, onClose, onCapture }) {
+  const videoRef = useRef(null);
+  const canvasRef = useRef(null);
+  const [stream, setStream] = useState(null);
+  const [error, setError] = useState(null);
+  const [captured, setCaptured] = useState(null);
+
+  useEffect(() => {
+    if (open) {
+      setCaptured(null);
+      setError(null);
+      navigator.mediaDevices.getUserMedia({ video: true })
+        .then((mediaStream) => {
+          setStream(mediaStream);
+          if (videoRef.current) {
+            videoRef.current.srcObject = mediaStream;
+          }
+        })
+        .catch((err) => {
+          setError('Unable to access camera');
+        });
+    } else {
+      if (stream) {
+        stream.getTracks().forEach((track) => track.stop());
+        setStream(null);
+      }
+    }
+    return () => {
+      if (stream) {
+        stream.getTracks().forEach((track) => track.stop());
+      }
+    };
+  }, [open]);
+
+  const handleCapture = () => {
+    const video = videoRef.current;
+    const canvas = canvasRef.current;
+    if (video && canvas) {
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const dataUrl = canvas.toDataURL('image/png');
+      setCaptured(dataUrl);
+    }
+  };
+
+  const handleUsePhoto = () => {
+    if (captured) {
+      onCapture(captured);
+      onClose();
+    }
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onClose}>
+      <DialogContent className="max-w-lg">
+        <DialogHeader>
+          <DialogTitle>Take a Photo</DialogTitle>
+        </DialogHeader>
+        {error ? (
+          <div className="text-red-500 text-center">{error}</div>
+        ) : (
+          <div className="flex flex-col items-center gap-4">
+            {!captured ? (
+              <>
+                <video ref={videoRef} autoPlay playsInline className="rounded-lg w-full max-w-xs aspect-video bg-black" />
+                <Button onClick={handleCapture} className="bg-blue-600 text-white">Capture</Button>
+              </>
+            ) : (
+              <>
+                <img src={captured} alt="Captured" className="rounded-lg w-full max-w-xs aspect-video object-cover" />
+                <div className="flex gap-2">
+                  <Button onClick={() => setCaptured(null)} variant="outline">Retake</Button>
+                  <Button onClick={handleUsePhoto} className="bg-blue-600 text-white">Use Photo</Button>
+                </div>
+              </>
+            )}
+            <canvas ref={canvasRef} className="hidden" />
+          </div>
+        )}
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 export function AvatarPickerDialog({ isOpen, onClose, onSave, currentAvatar }) {
   const [activeTab, setActiveTab] = useState('upload');
   const [genderFilter, setGenderFilter] = useState('all');
@@ -237,6 +324,7 @@ export function AvatarPickerDialog({ isOpen, onClose, onSave, currentAvatar }) {
   const [saveClicked, setSaveClicked] = useState(false);
   const fileInputRef = useRef(null);
   const cameraInputRef = useRef(null);
+  const [showCameraModal, setShowCameraModal] = useState(false);
 
   useEffect(() => {
     if (isOpen && currentAvatar) {
@@ -290,12 +378,24 @@ export function AvatarPickerDialog({ isOpen, onClose, onSave, currentAvatar }) {
     }
   };
 
+  // Helper to detect mobile
+  const isMobile = /Mobi|Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(
+    typeof navigator !== 'undefined' ? navigator.userAgent : ''
+  );
+
   const triggerFileUpload = () => {
     fileInputRef.current?.click();
   };
 
   const triggerCameraUpload = () => {
-    cameraInputRef.current?.click();
+    if (isMobile) {
+      if (cameraInputRef.current) {
+        cameraInputRef.current.value = '';
+        cameraInputRef.current.click();
+      }
+    } else {
+      setShowCameraModal(true);
+    }
   };
 
   const filteredSvgAvatars = genderFilter && genderFilter !== 'all'
@@ -303,187 +403,197 @@ export function AvatarPickerDialog({ isOpen, onClose, onSave, currentAvatar }) {
     : svgAvatars;
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-2xl animate-scale-in max-h-[85vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="text-xl flex items-center">
-            <span className="bg-gradient-to-r from-purple-600 to-blue-500 text-transparent bg-clip-text">
-              Change profile picture
-            </span>
-          </DialogTitle>
-          <p className="text-sm text-muted-foreground">
-            Upload a photo or select an avatar.
-          </p>
-        </DialogHeader>
+    <>
+      <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+        <DialogContent className="sm:max-w-2xl animate-scale-in max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-xl flex items-center">
+              <span className="bg-gradient-to-r from-purple-600 to-blue-500 text-transparent bg-clip-text">
+                Change profile picture
+              </span>
+            </DialogTitle>
+            <p className="text-sm text-muted-foreground">
+              Upload a photo or select an avatar.
+            </p>
+          </DialogHeader>
 
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid grid-cols-2 w-full mb-4">
-            <TabsTrigger value="upload" className="data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700">Upload</TabsTrigger>
-            <TabsTrigger value="svg" className="data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700">
-              Avatars
-            </TabsTrigger>
-          </TabsList>
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="grid grid-cols-2 w-full mb-4">
+              <TabsTrigger value="upload" className="data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700">Upload</TabsTrigger>
+              <TabsTrigger value="svg" className="data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700">
+                Avatars
+              </TabsTrigger>
+            </TabsList>
 
-          <TabsContent value="upload" className="py-4">
-            <div className="flex flex-col items-center space-y-6">
-              <p className="text-center text-gray-600">Choose how to add your picture</p>
-              
-              <div className="flex gap-4">
-                <Button 
-                  onClick={triggerCameraUpload}
-                  className="flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white px-8 py-6 text-lg rounded-xl"
-                >
-                  <Camera className="h-6 w-6" />
-                  Camera
-                </Button>
+            <TabsContent value="upload" className="py-4">
+              <div className="flex flex-col items-center space-y-6">
+                <p className="text-center text-gray-600">Choose how to add your picture</p>
                 
-                <Button 
-                  onClick={triggerFileUpload}
-                  className="flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white px-8 py-6 text-lg rounded-xl"
-                >
-                  <Monitor className="h-6 w-6" />
-                  This PC
-                </Button>
-              </div>
-
-              {uploadedImage && (
-                <div className="relative w-32 h-32 rounded-full overflow-hidden border-2 border-primary">
-                  <img 
-                    src={uploadedImage} 
-                    alt="Uploaded preview" 
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              )}
-
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={handleFileUpload}
-              />
-
-              <input
-                ref={cameraInputRef}
-                type="file"
-                accept="image/*"
-                capture="user"
-                className="hidden"
-                onChange={handleFileUpload}
-              />
-            </div>
-          </TabsContent>
-
-          <TabsContent value="svg" className="py-4">
-            <div className="mb-4">
-              <p className="mb-3 text-center text-gray-700 font-medium">Click on an avatar to select it.</p>
-              <div className="flex justify-center space-x-2 mb-6">
-                <Button 
-                  variant={genderFilter === 'all' ? 'default' : 'outline'} 
-                  size="sm" 
-                  onClick={() => setGenderFilter('all')}
-                  className={cn(
-                    "transition-all hover:shadow-glow px-6 py-2 rounded-full",
-                    genderFilter === 'all' 
-                      ? "bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white" 
-                      : "hover:bg-gray-100"
-                  )}
-                >
-                  All
-                </Button>
-                <Button 
-                  variant={genderFilter === 'male' ? 'default' : 'outline'} 
-                  size="sm" 
-                  onClick={() => setGenderFilter('male')}
-                  className={cn(
-                    "transition-all hover:shadow-glow px-6 py-2 rounded-full",
-                    genderFilter === 'male' 
-                      ? "bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white" 
-                      : "hover:bg-gray-100"
-                  )}
-                >
-                  Male
-                </Button>
-                <Button 
-                  variant={genderFilter === 'female' ? 'default' : 'outline'} 
-                  size="sm" 
-                  onClick={() => setGenderFilter('female')}
-                  className={cn(
-                    "transition-all hover:shadow-glow px-6 py-2 rounded-full",
-                    genderFilter === 'female' 
-                      ? "bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white" 
-                      : "hover:bg-gray-100"
-                  )}
-                >
-                  Female
-                </Button>
-                <Button 
-                  variant={genderFilter === 'alternative' ? 'default' : 'outline'} 
-                  size="sm" 
-                  onClick={() => setGenderFilter('alternative')}
-                  className={cn(
-                    "transition-all hover:shadow-glow px-6 py-2 rounded-full",
-                    genderFilter === 'alternative' 
-                      ? "bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white" 
-                      : "hover:bg-gray-100"
-                  )}
-                >
-                  Alternative
-                </Button>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-5 gap-4 max-h-80 overflow-y-auto pr-2">
-              {filteredSvgAvatars.map((avatar, index) => {
-                const avatarDataUrl = `data:image/svg+xml,${encodeURIComponent(avatar.svg)}`;
-                const isSelected = selectedAvatar === avatarDataUrl;
-                
-                return (
-                  <div 
-                    key={avatar.id}
-                    className={`
-                      cursor-pointer rounded-full p-1 transform transition-all duration-300 hover:scale-110
-                      ${isSelected ? 'ring-4 ring-blue-500 scale-110 shadow-lg bg-blue-50' : 'hover:bg-gray-50 hover:shadow-md'}
-                      relative flex items-center justify-center
-                    `}
-                    onClick={() => setSelectedAvatar(avatarDataUrl)}
-                    style={{ animationDelay: `${index * 50}ms` }}
+                <div className="flex gap-4">
+                  <Button 
+                    onClick={triggerCameraUpload}
+                    className="flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white px-8 py-6 text-lg rounded-xl"
                   >
-                    <div className="w-16 h-16 rounded-full overflow-hidden animate-fade-in bg-white border border-gray-100">
-                      <div 
-                        className="w-full h-full transition-transform duration-500 hover:scale-105"
-                        dangerouslySetInnerHTML={{ __html: avatar.svg }}
-                      />
-                    </div>
-                    {isSelected && (
-                      <div className="absolute -top-1 -right-1 bg-white rounded-full shadow-lg">
-                        <CheckCircle2 className="h-5 w-5 text-blue-500" />
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </TabsContent>
-        </Tabs>
+                    <Camera className="h-6 w-6" />
+                    Camera
+                  </Button>
+                  
+                  <Button 
+                    onClick={triggerFileUpload}
+                    className="flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white px-8 py-6 text-lg rounded-xl"
+                  >
+                    <Monitor className="h-6 w-6" />
+                    This PC
+                  </Button>
+                </div>
 
-        <div className="flex justify-end gap-2 mt-6">
-          <DialogClose asChild>
-            <Button variant="outline" className="hover:bg-muted/80 active:scale-95 transition-all">Cancel</Button>
-          </DialogClose>
-          <Button 
-            onClick={handleSave} 
-            className={cn(
-              "bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 transition-all hover:shadow-glow active:scale-95",
-              saveClicked && "animate-pulse"
-            )}
-            disabled={saveClicked}
-          >
-            {saveClicked ? "Saving..." : "Save"}
-          </Button>
-        </div>
-      </DialogContent>
-    </Dialog>
+                {uploadedImage && (
+                  <div className="relative w-32 h-32 rounded-full overflow-hidden border-2 border-primary">
+                    <img 
+                      src={uploadedImage} 
+                      alt="Uploaded preview" 
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                )}
+
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleFileUpload}
+                />
+
+                <input
+                  ref={cameraInputRef}
+                  type="file"
+                  accept="image/*"
+                  capture="user"
+                  className="hidden"
+                  onChange={handleFileUpload}
+                />
+              </div>
+            </TabsContent>
+
+            <TabsContent value="svg" className="py-4">
+              <div className="mb-4">
+                <p className="mb-3 text-center text-gray-700 font-medium">Click on an avatar to select it.</p>
+                <div className="flex justify-center space-x-2 mb-6">
+                  <Button 
+                    variant={genderFilter === 'all' ? 'default' : 'outline'} 
+                    size="sm" 
+                    onClick={() => setGenderFilter('all')}
+                    className={cn(
+                      "transition-all hover:shadow-glow px-6 py-2 rounded-full",
+                      genderFilter === 'all' 
+                        ? "bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white" 
+                        : "hover:bg-gray-100"
+                    )}
+                  >
+                    All
+                  </Button>
+                  <Button 
+                    variant={genderFilter === 'male' ? 'default' : 'outline'} 
+                    size="sm" 
+                    onClick={() => setGenderFilter('male')}
+                    className={cn(
+                      "transition-all hover:shadow-glow px-6 py-2 rounded-full",
+                      genderFilter === 'male' 
+                        ? "bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white" 
+                        : "hover:bg-gray-100"
+                    )}
+                  >
+                    Male
+                  </Button>
+                  <Button 
+                    variant={genderFilter === 'female' ? 'default' : 'outline'} 
+                    size="sm" 
+                    onClick={() => setGenderFilter('female')}
+                    className={cn(
+                      "transition-all hover:shadow-glow px-6 py-2 rounded-full",
+                      genderFilter === 'female' 
+                        ? "bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white" 
+                        : "hover:bg-gray-100"
+                    )}
+                  >
+                    Female
+                  </Button>
+                  <Button 
+                    variant={genderFilter === 'alternative' ? 'default' : 'outline'} 
+                    size="sm" 
+                    onClick={() => setGenderFilter('alternative')}
+                    className={cn(
+                      "transition-all hover:shadow-glow px-6 py-2 rounded-full",
+                      genderFilter === 'alternative' 
+                        ? "bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white" 
+                        : "hover:bg-gray-100"
+                    )}
+                  >
+                    Alternative
+                  </Button>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-5 gap-4 max-h-80 overflow-y-auto pr-2">
+                {filteredSvgAvatars.map((avatar, index) => {
+                  const avatarDataUrl = `data:image/svg+xml,${encodeURIComponent(avatar.svg)}`;
+                  const isSelected = selectedAvatar === avatarDataUrl;
+                  
+                  return (
+                    <div 
+                      key={avatar.id}
+                      className={`
+                        cursor-pointer rounded-full p-1 transform transition-all duration-300 hover:scale-110
+                        ${isSelected ? 'ring-4 ring-blue-500 scale-110 shadow-lg bg-blue-50' : 'hover:bg-gray-50 hover:shadow-md'}
+                        relative flex items-center justify-center
+                      `}
+                      onClick={() => setSelectedAvatar(avatarDataUrl)}
+                      style={{ animationDelay: `${index * 50}ms` }}
+                    >
+                      <div className="w-16 h-16 rounded-full overflow-hidden animate-fade-in bg-white border border-gray-100">
+                        <div 
+                          className="w-full h-full transition-transform duration-500 hover:scale-105"
+                          dangerouslySetInnerHTML={{ __html: avatar.svg }}
+                        />
+                      </div>
+                      {isSelected && (
+                        <div className="absolute -top-1 -right-1 bg-white rounded-full shadow-lg">
+                          <CheckCircle2 className="h-5 w-5 text-blue-500" />
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </TabsContent>
+          </Tabs>
+
+          <div className="flex justify-end gap-2 mt-6">
+            <DialogClose asChild>
+              <Button variant="outline" className="hover:bg-muted/80 active:scale-95 transition-all">Cancel</Button>
+            </DialogClose>
+            <Button 
+              onClick={handleSave} 
+              className={cn(
+                "bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 transition-all hover:shadow-glow active:scale-95",
+                saveClicked && "animate-pulse"
+              )}
+              disabled={saveClicked}
+            >
+              {saveClicked ? "Saving..." : "Save"}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+      <CameraCaptureModal
+        open={showCameraModal}
+        onClose={() => setShowCameraModal(false)}
+        onCapture={(dataUrl) => {
+          setUploadedImage(dataUrl);
+          setSelectedAvatar(dataUrl);
+        }}
+      />
+    </>
   );
 }

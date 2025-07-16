@@ -2,10 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { ArrowLeft, Plus, Search, FileText, Edit, Play } from 'lucide-react';
+import { ArrowLeft, Plus, Search, FileText, Edit, Play, MoreHorizontal } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { PageHeader } from '@/components/shared/PageHeader';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@/components/ui/dropdown-menu';
 
 const CourseDetail = () => {
   const { id } = useParams();
@@ -13,6 +15,8 @@ const CourseDetail = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [course, setCourse] = useState(null);
   const [modules, setModules] = useState([]);
+  const [editingModule, setEditingModule] = useState(null);
+  const [showEditDialog, setShowEditDialog] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -49,6 +53,85 @@ const CourseDetail = () => {
 
   const handleEditModule = (moduleId) => {
     navigate(`/modules/edit/${moduleId}?courseId=${id}`);
+  };
+
+  // Add a function to update a module in state and localStorage
+  const handleUpdateModule = (updatedModule) => {
+    setModules((prev) => {
+      const newModules = prev.map((m) => m.id === updatedModule.id ? { ...m, ...updatedModule } : m);
+      // Also update in localStorage
+      if (course) {
+        const updatedCourse = { ...course, modules: newModules };
+        setCourse(updatedCourse);
+        localStorage.setItem(`course-${course.id}`, JSON.stringify(updatedCourse));
+        // Also update in published-courses if present
+        const publishedCourses = JSON.parse(localStorage.getItem('published-courses') || '[]');
+        const idx = publishedCourses.findIndex(c => c.id === course.id);
+        if (idx !== -1) {
+          publishedCourses[idx] = updatedCourse;
+          localStorage.setItem('published-courses', JSON.stringify(publishedCourses));
+        }
+      }
+      return newModules;
+    });
+    setShowEditDialog(false);
+    setEditingModule(null);
+  };
+
+  // Module Edit Dialog UI
+  const renderEditDialog = () => {
+    if (!editingModule) return null;
+    const [form, setForm] = React.useState({ ...editingModule });
+    const [errors, setErrors] = React.useState({});
+    const handleChange = (e) => {
+      setForm({ ...form, [e.target.name]: e.target.value });
+    };
+    const handleSave = () => {
+      const errs = {};
+      if (!form.topic?.trim()) errs.topic = 'Module title is required';
+      if (!form.description?.trim()) errs.description = 'Description is required';
+      setErrors(errs);
+      if (Object.keys(errs).length === 0) {
+        handleUpdateModule(form);
+      }
+    };
+    return (
+      <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Edit Module</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium mb-1">Module Title</label>
+              <input
+                name="topic"
+                value={form.topic || ''}
+                onChange={handleChange}
+                className="w-full border rounded px-3 py-2"
+                autoFocus
+              />
+              {errors.topic && <div className="text-xs text-red-500 mt-1">{errors.topic}</div>}
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Description</label>
+              <textarea
+                name="description"
+                value={form.description || ''}
+                onChange={handleChange}
+                className="w-full border rounded px-3 py-2"
+                rows={3}
+              />
+              {errors.description && <div className="text-xs text-red-500 mt-1">{errors.description}</div>}
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setShowEditDialog(false)}>Cancel</Button>
+              <Button onClick={handleSave} className="bg-blue-600 text-white">Update</Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
   };
 
   if (!course) {
@@ -113,16 +196,26 @@ const CourseDetail = () => {
       ) : (
         <div className="grid grid-cols-1 gap-4">
           {filteredModules.map((module, index) => (
-            <Card key={module.id} className="hover:shadow-md transition-shadow">
+            <Card key={module.id} className="hover:shadow-md transition-shadow relative">
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-lg font-semibold flex items-center gap-2">
                     <FileText className="h-5 w-5 text-blue-600" />
                     <span>Module {index + 1}: {module.topic || module.title}</span>
                   </CardTitle>
-                  <Badge variant="default">
-                    Published
-                  </Badge>
+                  <Badge variant="default">Published</Badge>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="icon" className="h-8 w-8 p-0">
+                        <MoreHorizontal className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={() => { setEditingModule(module); setShowEditDialog(true); }}>
+                        <Edit className="h-4 w-4 mr-2" /> Edit
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
               </CardHeader>
               <CardContent>
@@ -164,6 +257,7 @@ const CourseDetail = () => {
           ))}
         </div>
       )}
+      {renderEditDialog()}
     </div>
   );
 };

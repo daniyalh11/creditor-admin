@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Search, MoreHorizontal, Mail, User, Shield } from 'lucide-react';
+import { Plus, Search, MoreHorizontal, Mail, User, Shield, Trash2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { AddInstructorDialog } from './AddInstructorDialog'; // Assumed to be converted to JSX
 import {
@@ -12,6 +12,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { BulkMessageModal } from '@/components/courses/learners/BulkMessageModal';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 /**
  * @typedef {'primary' | 'assistant' | 'guest'} InstructorRole
@@ -55,6 +58,12 @@ export const InstructorsSection = () => {
       department: 'Legal Studies'
     }
   ]);
+  const [showProfileModal, setShowProfileModal] = useState(false);
+  const [profileUser, setProfileUser] = useState(null);
+  const [showMessageModal, setShowMessageModal] = useState(false);
+  const [messageUser, setMessageUser] = useState(null);
+  const [showRoleModal, setShowRoleModal] = useState(false);
+  const [roleUser, setRoleUser] = useState(null);
 
   /**
    * Adds a new instructor to the list.
@@ -70,6 +79,25 @@ export const InstructorsSection = () => {
       status: 'active'
     };
     setInstructors([...instructors, newInstructor]);
+  };
+
+  /**
+   * Handles removing an instructor from the list.
+   * @param {string} instructorId
+   */
+  const handleRemoveInstructor = (instructorId) => {
+    setInstructors(instructors.filter(instructor => instructor.id !== instructorId));
+  };
+
+  /**
+   * Handles changing the role of an instructor.
+   * @param {string} instructorId
+   * @param {InstructorRole} newRole
+   */
+  const handleChangeRole = (instructorId, newRole) => {
+    setInstructors(instructors.map(instructor =>
+      instructor.id === instructorId ? { ...instructor, role: newRole } : instructor
+    ));
   };
 
   const filteredInstructors = instructors.filter(instructor =>
@@ -199,19 +227,20 @@ export const InstructorsSection = () => {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => { setProfileUser(instructor); setShowProfileModal(true); }}>
                         <User className="h-4 w-4 mr-2" />
                         View Profile
                       </DropdownMenuItem>
-                      <DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => { setMessageUser(instructor); setShowMessageModal(true); }}>
                         <Mail className="h-4 w-4 mr-2" />
                         Send Message
                       </DropdownMenuItem>
-                      <DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => { setRoleUser(instructor); setShowRoleModal(true); }}>
                         <Shield className="h-4 w-4 mr-2" />
                         Change Role
                       </DropdownMenuItem>
-                      <DropdownMenuItem className="text-red-600">
+                      <DropdownMenuItem onClick={() => handleRemoveInstructor(instructor.id)} className="text-red-600">
+                        <Trash2 className="h-4 w-4 mr-2" />
                         Remove from Course
                       </DropdownMenuItem>
                     </DropdownMenuContent>
@@ -228,6 +257,98 @@ export const InstructorsSection = () => {
         onClose={() => setShowAddInstructor(false)}
         onAdd={handleAddInstructor}
       />
+
+      {/* View Profile Modal */}
+      <Dialog open={showProfileModal} onOpenChange={setShowProfileModal}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Instructor Profile</DialogTitle>
+          </DialogHeader>
+          {profileUser && (
+            <div className="space-y-6">
+              <div className="flex items-center gap-4">
+                <Avatar className="h-16 w-16">
+                  <AvatarFallback className="bg-blue-100 text-blue-700 font-medium text-2xl">{getInitials(profileUser.name)}</AvatarFallback>
+                </Avatar>
+                <div>
+                  <div className="font-bold text-lg">{profileUser.name}</div>
+                  <div className="text-gray-600">{profileUser.email}</div>
+                  <Badge className="bg-blue-100 text-blue-800">{profileUser.role}</Badge>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <div className="text-gray-500 font-medium">Department</div>
+                  <div>{profileUser.department || 'N/A'}</div>
+                </div>
+                <div>
+                  <div className="text-gray-500 font-medium">Status</div>
+                  <Badge className={profileUser.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}>{profileUser.status}</Badge>
+                </div>
+                <div>
+                  <div className="text-gray-500 font-medium">Assigned</div>
+                  <div>{profileUser.assignedDate}</div>
+                </div>
+                <div>
+                  <div className="text-gray-500 font-medium">Role</div>
+                  <div>{profileUser.role}</div>
+                </div>
+              </div>
+              <div>
+                <div className="text-gray-500 font-medium mb-1">About</div>
+                <div className="text-gray-700 bg-gray-50 rounded p-3 min-h-[48px]">This instructor has not added a bio yet.</div>
+              </div>
+              <div>
+                <div className="text-gray-500 font-medium mb-1">Recent Activity</div>
+                <ul className="list-disc pl-5 text-gray-700 space-y-1">
+                  <li>Graded "Assignment 2"</li>
+                  <li>Posted announcement "Exam Schedule"</li>
+                  <li>Last login: 2024-05-02</li>
+                </ul>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+      {/* Send Message Modal (reuse BulkMessageModal for single user) */}
+      <BulkMessageModal
+        open={showMessageModal}
+        onOpenChange={setShowMessageModal}
+        selectedLearners={messageUser ? [messageUser] : []}
+      />
+      {/* Change Role Modal */}
+      <Dialog open={showRoleModal} onOpenChange={setShowRoleModal}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Change Instructor Role</DialogTitle>
+          </DialogHeader>
+          {roleUser && (
+            <form onSubmit={e => {
+              e.preventDefault();
+              const newRole = e.target.role.value;
+              setInstructors(instructors.map(inst => inst.id === roleUser.id ? { ...inst, role: newRole } : inst));
+              setShowRoleModal(false);
+              setRoleUser(null);
+            }} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-2">Select New Role</label>
+                <Select name="role" defaultValue={roleUser.role}>
+                  <SelectTrigger><SelectValue placeholder="Select role" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="primary">Primary</SelectItem>
+                    <SelectItem value="assistant">Assistant</SelectItem>
+                    <SelectItem value="guest">Guest</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex justify-end gap-2">
+                <Button type="button" variant="outline" onClick={() => { setShowRoleModal(false); setRoleUser(null); }}>Cancel</Button>
+                <Button type="submit">Save</Button>
+              </div>
+            </form>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

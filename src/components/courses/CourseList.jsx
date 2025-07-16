@@ -15,10 +15,6 @@ import { useNavigate } from 'react-router-dom';
 const CourseList = ({ courses, onCourseClick, onCourseAction }) => {
   const navigate = useNavigate();
 
-  const handleEditCourse = (courseId) => {
-    navigate(`/courses/create?edit=true&courseId=${courseId}`);
-  };
-
   const getCourseTypeBadge = (courseType) => {
     switch (courseType) {
       case 'Open':
@@ -117,7 +113,7 @@ const CourseList = ({ courses, onCourseClick, onCourseAction }) => {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent className="bg-white border shadow-lg">
-                    <DropdownMenuItem onClick={() => handleEditCourse(course.id)}>
+                    <DropdownMenuItem onClick={() => onCourseAction('edit', course.id)}>
                       <Edit className="h-4 w-4 mr-2" />
                       Edit Course
                     </DropdownMenuItem>

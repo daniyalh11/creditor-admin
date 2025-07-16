@@ -21,13 +21,10 @@ const CourseCreation = () => {
     }
   }, [isEdit, courseId]);
 
-  const handleUpdate = (updatedData) => {
-    if (isEdit && courseId) {
-      // Save updated course data to localStorage (simulate API)
-      localStorage.setItem(`course-${courseId}`, JSON.stringify(updatedData));
-      setCourseData(updatedData);
-      console.log('Course updated:', updatedData);
-    }
+  const handleUpdate = () => {
+    // This would typically save the course data
+    console.log('Updating course...');
+    // You can add actual update logic here
     navigate('/courses');
   };
 
@@ -45,11 +42,7 @@ const CourseCreation = () => {
 
         {isEdit && (
           <Button 
-            onClick={() => {
-              // Ask CourseCreationForm to submit the form
-              const form = document.querySelector('form');
-              if (form) form.requestSubmit();
-            }}
+            onClick={handleUpdate}
             className="bg-blue-600 hover:bg-blue-700 text-white"
           >
             <Save className="h-4 w-4 mr-2" />
@@ -58,7 +51,7 @@ const CourseCreation = () => {
         )}
       </div>
 
-      <CourseCreationForm courseData={courseData} onSubmit={isEdit ? handleUpdate : undefined} />
+      <CourseCreationForm courseData={courseData} />
     </div>
   );
 };

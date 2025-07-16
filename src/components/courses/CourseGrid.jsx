@@ -26,7 +26,7 @@ const CourseGrid = ({ courses, onCourseClick, onCourseAction }) => {
 
   const handleEditCourse = (courseId, e) => {
     e.stopPropagation();
-    navigate(`/courses/create?edit=true&courseId=${courseId}`);
+    onCourseAction('edit', courseId);
   };
 
   // Group courses by type

@@ -7,6 +7,8 @@ import { Plus, Search, Users, Grid3X3, List, FolderOpen } from "lucide-react";
 import { EnrollModal } from "@/components/courses/EnrollModal";
 import CourseGrid from "@/components/courses/CourseGrid";
 import CourseList from "@/components/courses/CourseList";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
 
 const Courses = () => {
   const navigate = useNavigate();
@@ -18,6 +20,9 @@ const Courses = () => {
   const [statusFilter, setStatusFilter] = useState('all-status');
   const [isEnrollModalOpen, setIsEnrollModalOpen] = useState(false);
   const [publishedCourses, setPublishedCourses] = useState([]);
+  const [editCourse, setEditCourse] = useState(null);
+  const [editCourseType, setEditCourseType] = useState(null);
+  const isEditModalOpen = !!editCourse;
   
   // Convert the hardcoded arrays to state
   const [openCourses, setOpenCourses] = useState([
@@ -331,41 +336,46 @@ const Courses = () => {
 
   const handleCourseAction = (action, courseId) => {
     console.log(`${action} for course ${courseId}`);
-    
+    let course = openCourses.find(c => c.id === courseId) || sequentialCourses.find(c => c.id === courseId) || publishedCourses.find(c => c.id === courseId);
+    let type = openCourses.find(c => c.id === courseId) ? 'open' : sequentialCourses.find(c => c.id === courseId) ? 'sequential' : 'published';
+
     switch (action) {
       case 'view':
         navigate(`/courses/view/${courseId}`);
         break;
-        
-      case 'archive':
-        // Create updated arrays with the toggled isActive status
-        setOpenCourses(prev => prev.map(course => 
-          course.id === courseId ? { ...course, isActive: !course.isActive } : course
-        ));
-        setSequentialCourses(prev => prev.map(course => 
-          course.id === courseId ? { ...course, isActive: !course.isActive } : course
-        ));
-        setPublishedCourses(prev => prev.map(course => 
-          course.id === courseId ? { ...course, isActive: !course.isActive } : course
-        ));
+      case 'edit':
+        setEditCourse(course);
+        setEditCourseType(type);
         break;
-        
+      case 'archive':
+        setOpenCourses(prev => prev.map(course => course.id === courseId ? { ...course, isActive: !course.isActive } : course));
+        setSequentialCourses(prev => prev.map(course => course.id === courseId ? { ...course, isActive: !course.isActive } : course));
+        setPublishedCourses(prev => prev.map(course => course.id === courseId ? { ...course, isActive: !course.isActive } : course));
+        break;
       case 'delete':
-        // Show confirmation dialog before deleting
         if (window.confirm('Are you sure you want to delete this course? This action cannot be undone.')) {
-          // Filter out the deleted course from all arrays
           setOpenCourses(prev => prev.filter(course => course.id !== courseId));
           setSequentialCourses(prev => prev.filter(course => course.id !== courseId));
           setPublishedCourses(prev => prev.filter(course => course.id !== courseId));
-          
           console.log(`Deleted course ${courseId}`);
           alert('Course deleted successfully!');
         }
         break;
-        
       default:
         console.warn(`Unknown action: ${action}`);
     }
+  };
+
+  const handleEditCourseSave = (updatedCourse) => {
+    if (editCourseType === 'open') {
+      setOpenCourses(prev => prev.map(course => course.id === updatedCourse.id ? updatedCourse : course));
+    } else if (editCourseType === 'sequential') {
+      setSequentialCourses(prev => prev.map(course => course.id === updatedCourse.id ? updatedCourse : course));
+    } else if (editCourseType === 'published') {
+      setPublishedCourses(prev => prev.map(course => course.id === updatedCourse.id ? updatedCourse : course));
+    }
+    setEditCourse(null);
+    setEditCourseType(null);
   };
 
   const handleCatalogClick = () => {
@@ -588,6 +598,60 @@ const Courses = () => {
         open={isEnrollModalOpen}
         onOpenChange={setIsEnrollModalOpen}
       />
+      {/* Edit Course Modal - always mounted for Radix Dialog stability */}
+      <Dialog 
+        open={isEditModalOpen} 
+        onOpenChange={(open) => { if (!open) { setEditCourse(null); setEditCourseType(null); } }}
+      >
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Edit Course</DialogTitle>
+          </DialogHeader>
+          {editCourse && (
+            <form onSubmit={e => {
+              e.preventDefault();
+              const form = e.target;
+              const updated = {
+                ...editCourse,
+                title: form.title.value,
+                description: form.description.value,
+                difficulty: form.difficulty.value,
+                duration: form.duration.value
+              };
+              handleEditCourseSave(updated);
+              // Do NOT call setEditCourse(null) or setEditCourseType(null) here
+            }} className="space-y-4">
+              <div>
+                <Label htmlFor="title">Title</Label>
+                <Input id="title" name="title" defaultValue={editCourse.title} required />
+              </div>
+              <div>
+                <Label htmlFor="description">Description</Label>
+                <Input id="description" name="description" defaultValue={editCourse.description} required />
+              </div>
+              <div>
+                <Label htmlFor="difficulty">Difficulty</Label>
+                <Select name="difficulty" defaultValue={editCourse.difficulty}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Beginner">Beginner</SelectItem>
+                    <SelectItem value="Intermediate">Intermediate</SelectItem>
+                    <SelectItem value="Advanced">Advanced</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label htmlFor="duration">Duration</Label>
+                <Input id="duration" name="duration" defaultValue={editCourse.duration} required />
+              </div>
+              <div className="flex justify-end gap-2">
+                <Button type="button" variant="outline" onClick={() => { setEditCourse(null); setEditCourseType(null); }}>Cancel</Button>
+                <Button type="submit">Save</Button>
+              </div>
+            </form>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

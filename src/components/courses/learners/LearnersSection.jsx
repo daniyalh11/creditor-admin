@@ -16,6 +16,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 export const LearnersSection = () => {
   const [showAddLearner, setShowAddLearner] = useState(false);
@@ -64,6 +65,10 @@ export const LearnersSection = () => {
     }
   ]);
   const [showInstructions, setShowInstructions] = useState(false);
+  const [showProfileModal, setShowProfileModal] = useState(false);
+  const [profileUser, setProfileUser] = useState(null);
+  const [showMessageModal, setShowMessageModal] = useState(false);
+  const [messageUser, setMessageUser] = useState(null);
 
   const handleAddLearner = (learnerData) => {
     const newLearner = {
@@ -367,11 +372,11 @@ export const LearnersSection = () => {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => { setProfileUser(learner); setShowProfileModal(true); }}>
                           <User className="h-4 w-4 mr-2" />
                           View Profile
                         </DropdownMenuItem>
-                        <DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => { setMessageUser(learner); setShowMessageModal(true); }}>
                           <Mail className="h-4 w-4 mr-2" />
                           Send Message
                         </DropdownMenuItem>
@@ -418,6 +423,65 @@ export const LearnersSection = () => {
         onOpenChange={setShowRewardModal}
         onRewardSent={handleRewardSent}
         course={currentCourse}
+      />
+
+      {/* View Profile Modal - always mounted */}
+      <Dialog open={showProfileModal} onOpenChange={setShowProfileModal}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Profile</DialogTitle>
+          </DialogHeader>
+          {profileUser && (
+            <div className="space-y-6">
+              <div className="flex items-center gap-4">
+                <Avatar className="h-16 w-16">
+                  <AvatarFallback className="bg-blue-100 text-blue-700 font-medium text-2xl">{getInitials(profileUser.name)}</AvatarFallback>
+                </Avatar>
+                <div>
+                  <div className="font-bold text-lg">{profileUser.name}</div>
+                  <div className="text-gray-600">{profileUser.email}</div>
+                  <Badge className={getRoleColor(profileUser.role)}>{getRoleIcon(profileUser.role)} {profileUser.role.charAt(0).toUpperCase() + profileUser.role.slice(1)}</Badge>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <div className="text-gray-500 font-medium">Role</div>
+                  <div>{profileUser.role.charAt(0).toUpperCase() + profileUser.role.slice(1)}</div>
+                </div>
+                <div>
+                  <div className="text-gray-500 font-medium">Status</div>
+                  <Badge className={getStatusColor(profileUser.status)}>{profileUser.status.charAt(0).toUpperCase() + profileUser.status.slice(1)}</Badge>
+                </div>
+                <div>
+                  <div className="text-gray-500 font-medium">Enrolled</div>
+                  <div>{profileUser.enrollmentDate}</div>
+                </div>
+                <div>
+                  <div className="text-gray-500 font-medium">Progress</div>
+                  <div>{profileUser.progress}%</div>
+                </div>
+              </div>
+              <div>
+                <div className="text-gray-500 font-medium mb-1">About</div>
+                <div className="text-gray-700 bg-gray-50 rounded p-3 min-h-[48px]">This user has not added a bio yet.</div>
+              </div>
+              <div>
+                <div className="text-gray-500 font-medium mb-1">Recent Activity</div>
+                <ul className="list-disc pl-5 text-gray-700 space-y-1">
+                  <li>Completed "Module 1: Introduction"</li>
+                  <li>Scored 85% on "Quiz 1"</li>
+                  <li>Last login: 2024-05-01</li>
+                </ul>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+      {/* Send Message Modal (reuse BulkMessageModal for single user) - always mounted */}
+      <BulkMessageModal
+        open={showMessageModal}
+        onOpenChange={setShowMessageModal}
+        selectedLearners={messageUser ? [messageUser] : []}
       />
     </div>
   );

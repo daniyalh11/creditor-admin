@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -16,43 +16,41 @@ const ModuleBuilder = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const [module, setModule] = useState({
-    id: id || '1',
-    title: 'Legal System Basics',
-    description: 'Overview of legal systems and structures',
-    courseId: courseId || '1',
-    courseTitle: 'Introduction to Legal Studies',
-    image: '',
-    units: [
-      {
-        id: 'unit-1',
-        title: 'Introduction to Legal Concepts',
-        description: 'Basic understanding of legal terminology and concepts',
-        lessons: [
-          {
-            id: 'lesson-1',
-            title: 'Legal Terminology',
-            sections: [
-              {
-                id: 'section-1',
-                type: 'text',
-                title: 'Common Legal Terms',
-                content: 'This section covers common legal terminology used in the field.'
-              }
-            ]
-          }
-        ]
-      }
-    ]
-  });
+  const [module, setModule] = useState(null);
 
   const [activeTab, setActiveTab] = useState('content');
 
+  // Load module from course in localStorage
+  useEffect(() => {
+    if (id && courseId) {
+      const courseData = localStorage.getItem(`course-${courseId}`);
+      if (courseData) {
+        const parsedCourse = JSON.parse(courseData);
+        const foundModule = parsedCourse.modules?.find(m => m.id === id);
+        if (foundModule) {
+          setModule(foundModule);
+        }
+      }
+    }
+  }, [id, courseId]);
+
   const handleSave = () => {
-    toast({
-      title: "Module saved",
-      description: "Module has been successfully saved."
-    });
+    if (!module || !courseId) return;
+    // Update the module in the course's modules array
+    const courseData = localStorage.getItem(`course-${courseId}`);
+    if (courseData) {
+      const parsedCourse = JSON.parse(courseData);
+      const updatedModules = (parsedCourse.modules || []).map(m =>
+        m.id === module.id ? { ...m, ...module, id: m.id } : m
+      );
+      const updatedCourse = { ...parsedCourse, modules: updatedModules };
+      localStorage.setItem(`course-${courseId}`, JSON.stringify(updatedCourse));
+      toast({
+        title: "Module saved",
+        description: "Module has been successfully saved."
+      });
+      navigate(`/courses/${courseId}`);
+    }
   };
 
   const handlePublish = () => {
@@ -65,6 +63,10 @@ const ModuleBuilder = () => {
   const handleBackToContent = () => {
     setActiveTab('content');
   };
+
+  if (!module) {
+    return <div className="container mx-auto py-12 text-center text-lg">Module not found</div>;
+  }
 
   return (
     <div className="container mx-auto py-6 space-y-6 animate-fade-in">
@@ -97,7 +99,7 @@ const ModuleBuilder = () => {
                     </label>
                     <Input
                       value={module.title}
-                      onChange={(e) => setModule({ ...module, title: e.target.value })}
+                      onChange={(e) => setModule({ ...module, title: e.target.value, topic: e.target.value })}
                       className="text-lg font-medium"
                     />
                   </div>
