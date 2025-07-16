@@ -161,12 +161,12 @@ const Messages = () => {
   };
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="animate-fade-in">
       <PageHeader title="Messages" description="Connect with your peers and instructors" />
 
       <div
         className="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm"
-        style={{ height: 'calc(100vh - 200px)' }}
+        style={{ height: 'calc(100vh - 72px)' }} // adjust 72px to your actual header height
       >
         <div className="flex h-full">
           <div
